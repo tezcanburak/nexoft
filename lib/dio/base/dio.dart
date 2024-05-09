@@ -1,8 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:nexoft/dio/constants/api_constants.dart';
 import 'package:nexoft/model/shared_preferences/item.dart';
-
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class DioClient {
   final Dio _dio;
@@ -18,14 +17,12 @@ class DioClient {
   final _storage = const FlutterSecureStorage();
 
   IOSOptions _getIOSOptions() => const IOSOptions(
-    accountName: 'flutter_secure_storage_service',
-  );
+        accountName: 'flutter_secure_storage_service',
+      );
 
   AndroidOptions _getAndroidOptions() => const AndroidOptions(
-    encryptedSharedPreferences: true,
-    // sharedPreferencesName: 'Test2',
-    // preferencesKeyPrefix: 'Test'
-  );
+        encryptedSharedPreferences: true,
+      );
 
   Future<List<Item>> _readAll() async {
     const storage = FlutterSecureStorage();
@@ -39,12 +36,12 @@ class DioClient {
 
   // Get:-----------------------------------------------------------------------
   Future<Response> get(
-      String url, {
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onReceiveProgress,
-      }) async {
+    String url, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onReceiveProgress,
+  }) async {
     try {
       List<Item> listOf = await _readAll();
 
@@ -74,14 +71,14 @@ class DioClient {
 
   // Post:----------------------------------------------------------------------
   Future<Response> post(
-      String url, {
-        data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onSendProgress,
-        ProgressCallback? onReceiveProgress,
-      }) async {
+    String url, {
+    data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
     try {
       List<Item> listOf = await _readAll();
       String token = "";
@@ -89,7 +86,6 @@ class DioClient {
         Item? tokenItem = listOf.firstWhere((item) => item.key == 'token');
         token = tokenItem.value;
       }
-
 
       if (token != "") {
         options ??= Options();

@@ -15,19 +15,19 @@ class HomeRepository {
     }
   }
 
-  Future<List<User>?> getAllUsers() async {
+  Future<ApiResult<List<User>?>> getAllUsers() async {
     final Response response = await dioC!.get(
       ApiConstants.userUrl,
+      queryParameters: {
+        'accept': 'text/plain',
+        'ApiKey': '49fbc414-78fb-4fd4-953d-be210be2a829',
+      },
     );
     ApiResult<List<User>> apiResult = ApiResult<List<User>>.fromJson(
       response.data,
       (dynamic jsonData) => (jsonData as List).map((e) => User.fromJson(e)).toList(),
     );
 
-    if (apiResult.success == false) {
-      return null;
-    } else {
-      return apiResult.data;
-    }
+    return apiResult;
   }
 }

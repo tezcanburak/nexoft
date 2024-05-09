@@ -18,82 +18,39 @@ class CommonDecorations {
     );
   }
 
-  static BoxDecoration whiteTextFieldDecoration() {
+  static BoxDecoration pageColorBorder10() {
     return BoxDecoration(
-      color: ColorConstants.white,
-      borderRadius: BorderRadius.circular(8),
-    );
-  }
-
-  static InputDecoration commonLoginDecoration(String hintText) {
-    return InputDecoration(
-      isDense: true,
-      contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      hintText: hintText,
-      hintStyle: TextStyle(
-        color: ColorConstants.black,
-        fontSize: 16,
-      ),
-      enabledBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(color: Colors.transparent),
-      ),
-      focusedBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(color: Colors.transparent),
-      ),
-    );
-  }
-
-  static Decoration gradientRedDecoration() {
-    return BoxDecoration(
-      gradient: LinearGradient(
-        colors: [
-          ColorConstants.black,
-          ColorConstants.green,
-        ],
-        begin: Alignment.bottomLeft,
-        end: Alignment.topRight,
-        stops: const [0, 1],
-      ),
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(32.0),
-        topRight: Radius.circular(32.0),
-      ),
-    );
-  }
-
-  static Decoration appBarRedDecoration() {
-    return BoxDecoration(
-      borderRadius: const BorderRadius.only(
-        bottomRight: Radius.circular(8),
-        bottomLeft: Radius.circular(8),
-      ),
-      gradient: LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          ColorConstants.green,
-          ColorConstants.grey,
-        ],
-      ),
-    );
-  }
-
-  static BoxDecoration bgPhotoDecoration() {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(12),
-      image: const DecorationImage(
-        image: AssetImage(
-          'assets/png/point_list_bg.png',
-        ),
-        fit: BoxFit.cover,
-      ),
+      color: ColorConstants.pageColor,
+      borderRadius: BorderRadius.circular(10),
       boxShadow: [
         BoxShadow(
           color: Colors.black.withOpacity(0.25),
-          offset: const Offset(0, 2),
-          blurRadius: 2,
+          offset: const Offset(0, 0),
+          blurRadius: 4,
         ),
       ],
+    );
+  } static BoxDecoration pageColorBorder15() {
+    return BoxDecoration(
+      color: ColorConstants.pageColor,
+      borderRadius: BorderRadius.circular(15),
+    );
+  }
+
+  static InputDecoration textFormFieldDecoration(String hintText) {
+    return InputDecoration(
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      hintText: hintText,
+      hintStyle: CommonStyles.bodyLargeGrey(),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: BorderSide(color: ColorConstants.black, width: 1),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: BorderSide(color: ColorConstants.black, width: 1),
+      ),
     );
   }
 }
