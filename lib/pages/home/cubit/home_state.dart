@@ -2,24 +2,28 @@ part of 'home_cubit.dart';
 
 class HomeState extends Equatable {
   final List<User> userList;
-  final List<String> errorMessage;
+  final List<User> filteredUserList;
+  final List<String> errorMessageList;
   final Status fetchStatus;
 
   const HomeState({
     this.userList = const [],
-    this.errorMessage = const [],
+    this.filteredUserList = const [],
+    this.errorMessageList = const [],
     this.fetchStatus = Status.idle,
   });
 
   HomeState copyWith({
     List<User>? userList,
-    List<String>? errorMessage,
+    List<User>? filteredUserList,
+    List<String>? errorMessageList,
     Status? fetchStatus,
   }) {
     return HomeState(
       userList: userList ?? this.userList,
       fetchStatus: fetchStatus ?? this.fetchStatus,
-      errorMessage: errorMessage ?? this.errorMessage,
+      errorMessageList: errorMessageList ?? this.errorMessageList,
+      filteredUserList: filteredUserList ?? this.filteredUserList,
     );
   }
 
@@ -27,6 +31,7 @@ class HomeState extends Equatable {
   List<Object?> get props => [
         userList,
         fetchStatus,
-        errorMessage,
+        errorMessageList,
+        filteredUserList,
       ];
 }

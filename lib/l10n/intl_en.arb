@@ -1,8 +1,12 @@
 {
+  "addContactsText": "Contacts you’ve added will appear here.",
   "cancel": "Cancel",
   "changePhoto": "Change Photo",
   "contacts": "Contacts",
+  "createContact": "Create New Contact",
   "done": "Done",
   "edit": "Edit",
-  "deleteAccount": "Delete Account"
+  "deleteAccount": "Delete Account",
+  "noContacts": "No Contacts",
+  "search": "Search by name"
 }

@@ -1,8 +1,16 @@
 import 'package:nexoft/exports.dart';
+import 'package:nexoft/model/user.dart';
 import 'package:nexoft/pages/home/cubit/home_cubit.dart';
 
 class UpsertUserForm extends StatelessWidget {
-  const UpsertUserForm({super.key});
+  const UpsertUserForm({
+    super.key,
+    required this.isUpdate,
+    this.user,
+  });
+
+  final bool isUpdate;
+  final User? user;
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +28,10 @@ class UpsertUserForm extends StatelessWidget {
             width: size.width * 0.45,
             height: size.width * 0.45,
             decoration: const BoxDecoration(
-              color: Colors.black,
               shape: BoxShape.circle,
+              image: DecorationImage(
+                image: AssetImage('assets/png/profile_picture.png'),
+              ),
             ),
           ),
 
@@ -40,6 +50,8 @@ class UpsertUserForm extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 24),
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Text(
@@ -71,8 +83,9 @@ class UpsertUserForm extends StatelessWidget {
               style: CommonStyles.bodyLargeBlack(),
             ),
           ),
+          const SizedBox(height: 11),
           Divider(
-            height: 30,
+            height: 8,
             thickness: 1,
             color: ColorConstants.grey,
           ),

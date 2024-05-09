@@ -1,4 +1,5 @@
 import 'package:nexoft/exports.dart';
+import 'package:nexoft/model/user.dart';
 import 'package:nexoft/pages/home/cubit/home_cubit.dart';
 import 'package:nexoft/pages/upsert_user/view/upsert_user_page.dart';
 
@@ -14,17 +15,8 @@ class HomeForm extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Text(
-                AppLocalizations.of(context)!.contacts,
-                style: CommonStyles.titleLargeBlack(),
-              ),
-              const Spacer(),
-              SvgPicture.asset('assets/svg/blue_plus_icon.svg'),
-            ],
-          ),
-          const SizedBox(height: 15),
+          _ContactsAndAddButton(),
+          const SizedBox(height: 16),
           _SearchBarWidget(),
           Expanded(
             child: _UserList(),
@@ -35,100 +27,23 @@ class HomeForm extends StatelessWidget {
   }
 }
 
-class _UserList extends StatelessWidget {
+class _ContactsAndAddButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeCubit, HomeState>(
-      builder: (context, state) {
-        return ListView.separated(
-          itemCount: 10,
-          //state.userList.length,
-          shrinkWrap: true,
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          itemBuilder: (context, index) {
-            return InkWell(
-              onTap: () => Navigator.push(context, _updateRoute()),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: ColorConstants.white,
-                ),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 20),
-                    Container(
-                      height: 34,
-                      width: 34,
-                      decoration: const BoxDecoration(
-                        color: Colors.black,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 13),
-                        Text(
-                          'Alice Wellington',
-                          style: CommonStyles.bodyLargeBlack(),
-                        ),
-                        Text(
-                          '+1234567890',
-                          style: CommonStyles.bodyLargeGrey(),
-                        ),
-                        const SizedBox(height: 13),
-                      ],
-                    ),
-                    const SizedBox(width: 20),
-                  ],
-                ),
-              ),
-            );
-          },
-          separatorBuilder: (context, index) => const SizedBox(height: 20),
-        );
-      },
+    return Row(
+      children: [
+        Text(
+          AppLocalizations.of(context)!.contacts,
+          style: CommonStyles.titleLargeBlack(),
+        ),
+        const Spacer(),
+        InkWell(
+          onTap: () => Navigator.push(context, _animatedRoute(false, null)),
+          child: SvgPicture.asset('assets/svg/blue_plus_icon.svg'),
+        ),
+      ],
     );
   }
-}
-
-Route _createRoute() {
-  return PageRouteBuilder(
-    transitionDuration: const Duration(milliseconds: 1000),
-    pageBuilder: (context, animation, secondaryAnimation) => const UpsertUserPage(isUpdate: false),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 1.0);
-      const end = Offset.zero;
-      const curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
-}
-
-Route _updateRoute() {
-  return PageRouteBuilder(
-    transitionDuration: const Duration(milliseconds: 1000),
-    pageBuilder: (context, animation, secondaryAnimation) => const UpsertUserPage(isUpdate: true),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 1.0);
-      const end = Offset.zero;
-      const curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
 }
 
 class _SearchBarWidget extends StatelessWidget {
@@ -136,14 +51,14 @@ class _SearchBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var cubit = context.read<HomeCubit>();
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         color: Colors.white,
       ),
       child: TextField(
-        // onChanged: (value) => searchBloc.add(FilterUserListRequested(value.trim())),
-
+        onChanged: (value) => cubit.filterUserListRequested(value.trim()),
         cursorColor: ColorConstants.black,
         style: TextStyle(
           color: ColorConstants.black,
@@ -155,15 +70,16 @@ class _SearchBarWidget extends StatelessWidget {
           hintStyle: TextStyle(
             color: ColorConstants.black.withOpacity(0.4),
           ),
-          hintText: 'search',
-          prefixIcon: const Icon(
-            Icons.search,
-            color: Colors.black,
+          hintText: AppLocalizations.of(context)!.search,
+          prefixIconConstraints: const BoxConstraints(maxHeight: 21),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.only(left: 12, right: 15),
+            child: SvgPicture.asset('assets/svg/search_icon.svg'),
           ),
           suffixIcon: IconButton(
             onPressed: () {
-              //     _searchController.clear();
-              //     searchBloc.add(FilterUserListRequested(_searchController.text.trim()));
+              _searchController.clear();
+              cubit.filterUserListRequested(_searchController.text.trim());
             },
             icon: Icon(
               Icons.clear,
@@ -178,4 +94,120 @@ class _SearchBarWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+class _UserList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HomeCubit, HomeState>(
+      buildWhen: (prev, curr) => prev.filteredUserList != curr.filteredUserList,
+      builder: (context, state) {
+        if (state.filteredUserList.isNotEmpty) {
+          return ListView.separated(
+            itemCount: state.filteredUserList.length,
+            shrinkWrap: true,
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            itemBuilder: (context, index) {
+              var user = state.filteredUserList[index];
+              return InkWell(
+                onTap: () => Navigator.push(context, _animatedRoute(true, user)),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: ColorConstants.white,
+                  ),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 20),
+                      Container(
+                        height: 34,
+                        width: 34,
+                        decoration: const BoxDecoration(
+                          color: Colors.black,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 13),
+                          Text(
+                            user.firstName ?? '',
+                            style: CommonStyles.bodyLargeBlack(),
+                          ),
+                          Text(
+                            user.phoneNumber ?? '',
+                            style: CommonStyles.bodyLargeGrey(),
+                          ),
+                          const SizedBox(height: 13),
+                        ],
+                      ),
+                      const SizedBox(width: 20),
+                    ],
+                  ),
+                ),
+              );
+            },
+            separatorBuilder: (context, index) => const SizedBox(height: 20),
+          );
+        }
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/png/profile_picture.png',
+              width: 60,
+              height: 60,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              AppLocalizations.of(context)!.noContacts,
+              textAlign: TextAlign.center,
+              style: CommonStyles.titleLargeBlack(),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              AppLocalizations.of(context)!.addContactsText,
+              textAlign: TextAlign.center,
+              style: CommonStyles.bodyLargeBlack(),
+            ),
+            TextButton(
+              onPressed: () => Navigator.push(context, _animatedRoute(false, null)),
+              child: Text(
+                AppLocalizations.of(context)!.createContact,
+                textAlign: TextAlign.center,
+                style: CommonStyles.bodyLargeBlue(),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+Route _animatedRoute(bool isUpdate, User? user) {
+  return PageRouteBuilder(
+    transitionDuration: const Duration(milliseconds: 1000),
+    pageBuilder: (context, animation, secondaryAnimation) => UpsertUserPage(
+      isUpdate: isUpdate,
+      user: user,
+    ),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(0.0, 1.0);
+      const end = Offset.zero;
+      const curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
 }

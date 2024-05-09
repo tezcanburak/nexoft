@@ -4,7 +4,6 @@ import 'pages/home/view/home_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'pages/home/repository/home_repository.dart';
 import 'package:nexoft/pages/home/cubit/home_cubit.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
@@ -12,7 +11,7 @@ void main() {
 }
 
 class App extends StatefulWidget {
-  const App({Key? key}) : super(key: key);
+  const App({super.key});
 
   @override
   State<App> createState() => _AppState();
@@ -32,7 +31,7 @@ class _AppState extends State<App> {
     return RepositoryProvider.value(
       value: _homeRepository,
       child: BlocProvider(
-        create: (context) => HomeCubit(homeRepository: _homeRepository),
+        create: (context) => HomeCubit(homeRepository: _homeRepository)..getAllUserListRequested(),
         child: const AppView(),
       ),
     );
@@ -40,7 +39,7 @@ class _AppState extends State<App> {
 }
 
 class AppView extends StatefulWidget {
-  const AppView({Key? key}) : super(key: key);
+  const AppView({super.key});
 
   @override
   State<AppView> createState() => _AppViewState();
