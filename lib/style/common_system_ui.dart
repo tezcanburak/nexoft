@@ -17,7 +17,7 @@ class SystemUi{
       statusBarBrightness: Brightness.light,    // this is for IOS
       statusBarIconBrightness: Brightness.dark, // this is for Android
       systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarIconBrightness: Brightness.light,
+      systemNavigationBarIconBrightness: Brightness.dark,
     );
   }
 }

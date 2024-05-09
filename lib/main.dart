@@ -1,9 +1,9 @@
-import 'constants/common_system_ui.dart';
 import 'exports.dart';
-import 'home/view/home_page.dart';
-import 'home/repository/home_repository.dart';
+import 'style/common_system_ui.dart';
+import 'pages/home/view/home_page.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:nexoft/home/cubit/home_cubit.dart';
+import 'pages/home/repository/home_repository.dart';
+import 'package:nexoft/pages/home/cubit/home_cubit.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -65,23 +65,30 @@ class _AppViewState extends State<AppView> {
         Locale('en'), // English
         Locale('tr'), // Turkish
       ],
-      theme: ThemeData.light().copyWith(
+      theme: ThemeData.dark().copyWith(
         snackBarTheme: SnackBarThemeData(
           elevation: 4,
           backgroundColor: ColorConstants.pageColor,
-          contentTextStyle: const TextStyle(color: Colors.white),
+          contentTextStyle: TextStyle(color: ColorConstants.black),
         ),
-        textTheme: GoogleFonts.nunitoTextTheme().apply(bodyColor: Colors.white),
-        scaffoldBackgroundColor: ColorConstants.white,
+        textTheme: GoogleFonts.nunitoTextTheme().apply(bodyColor: ColorConstants.black),
+        scaffoldBackgroundColor: ColorConstants.pageColor,
         appBarTheme: AppBarTheme(
+          elevation: 0,
           color: Colors.transparent,
           systemOverlayStyle: SystemUi.darkStyle(),
         ),
       ),
-      darkTheme: ThemeData.light().copyWith(
-        textTheme: GoogleFonts.nunitoTextTheme().apply(bodyColor: Colors.white),
+      darkTheme: ThemeData.dark().copyWith(
+        snackBarTheme: SnackBarThemeData(
+          elevation: 4,
+          backgroundColor: ColorConstants.pageColor,
+          contentTextStyle: TextStyle(color: ColorConstants.black),
+        ),
+        textTheme: GoogleFonts.nunitoTextTheme().apply(bodyColor: ColorConstants.black),
         scaffoldBackgroundColor: ColorConstants.pageColor,
         appBarTheme: AppBarTheme(
+          elevation: 0,
           color: Colors.transparent,
           systemOverlayStyle: SystemUi.darkStyle(),
         ),

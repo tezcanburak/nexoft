@@ -1,5 +1,6 @@
 import 'package:nexoft/exports.dart';
-import 'package:nexoft/home/repository/home_repository.dart';
+import 'package:nexoft/model/user.dart';
+import 'package:nexoft/pages/home/repository/home_repository.dart';
 
 part 'home_state.dart';
 

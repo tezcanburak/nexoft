@@ -6,8 +6,13 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: HomeForm(),
+    ScreenUtil.setScreenSize(context);
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.zero,
+        child: AppBar(),
+      ),
+      body: const HomeForm(),
     );
   }
 }

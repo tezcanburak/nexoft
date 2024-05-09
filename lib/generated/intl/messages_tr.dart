@@ -1,5 +1,5 @@
 // DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
-// This is a library that provides messages for a en locale. All the
+// This is a library that provides messages for a tr locale. All the
 // messages from the main program should be duplicated here with the same
 // function name.
 
@@ -18,15 +18,16 @@ final messages = new MessageLookup();
 typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 
 class MessageLookup extends MessageLookupByLibrary {
-  String get localeName => 'en';
+  String get localeName => 'tr';
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
-        "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
-        "changePhoto": MessageLookupByLibrary.simpleMessage("Change Photo"),
-        "contacts": MessageLookupByLibrary.simpleMessage("Contacts"),
-        "deleteAccount": MessageLookupByLibrary.simpleMessage("Delete Account"),
-        "done": MessageLookupByLibrary.simpleMessage("Done"),
-        "edit": MessageLookupByLibrary.simpleMessage("Edit")
+        "cancel": MessageLookupByLibrary.simpleMessage("İptal"),
+        "changePhoto":
+            MessageLookupByLibrary.simpleMessage("Fotoğrafı Değiştir"),
+        "contacts": MessageLookupByLibrary.simpleMessage("Kişiler"),
+        "deleteAccount": MessageLookupByLibrary.simpleMessage("Hesabı Sil"),
+        "done": MessageLookupByLibrary.simpleMessage("Tamamla"),
+        "edit": MessageLookupByLibrary.simpleMessage("Düzenle")
       };
 }
