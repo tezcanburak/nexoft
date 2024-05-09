@@ -1,3 +1,4 @@
+import 'constants/common_system_ui.dart';
 import 'exports.dart';
 import 'home/view/home_page.dart';
 import 'home/repository/home_repository.dart';
@@ -31,7 +32,7 @@ class _AppState extends State<App> {
     return RepositoryProvider.value(
       value: _homeRepository,
       child: BlocProvider(
-        create: (context) => HomeCubit(_homeRepository),
+        create: (context) => HomeCubit(homeRepository: _homeRepository),
         child: const AppView(),
       ),
     );
@@ -47,16 +48,6 @@ class AppView extends StatefulWidget {
 
 class _AppViewState extends State<AppView> {
   final _navigatorKey = GlobalKey<NavigatorState>();
-
-  NavigatorState get _navigator => _navigatorKey.currentState!;
-
-  ThemeData _buildTheme(brightness) {
-    var baseTheme = ThemeData(brightness: brightness);
-
-    return baseTheme.copyWith(
-      textTheme: GoogleFonts.nunitoTextTheme(baseTheme.textTheme),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +65,27 @@ class _AppViewState extends State<AppView> {
         Locale('en'), // English
         Locale('tr'), // Turkish
       ],
-      theme: _buildTheme(Brightness.dark),
+      theme: ThemeData.light().copyWith(
+        snackBarTheme: SnackBarThemeData(
+          elevation: 4,
+          backgroundColor: ColorConstants.pageColor,
+          contentTextStyle: const TextStyle(color: Colors.white),
+        ),
+        textTheme: GoogleFonts.nunitoTextTheme().apply(bodyColor: Colors.white),
+        scaffoldBackgroundColor: ColorConstants.white,
+        appBarTheme: AppBarTheme(
+          color: Colors.transparent,
+          systemOverlayStyle: SystemUi.darkStyle(),
+        ),
+      ),
+      darkTheme: ThemeData.light().copyWith(
+        textTheme: GoogleFonts.nunitoTextTheme().apply(bodyColor: Colors.white),
+        scaffoldBackgroundColor: ColorConstants.pageColor,
+        appBarTheme: AppBarTheme(
+          color: Colors.transparent,
+          systemOverlayStyle: SystemUi.darkStyle(),
+        ),
+      ),
       home: const HomePage(),
     );
   }

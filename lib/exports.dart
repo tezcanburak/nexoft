@@ -1,4 +1,6 @@
 export 'main.dart';
+export 'constants/color.dart';
+export 'home/enum/status.dart';
 export 'package:bloc/bloc.dart';
 export 'constants/screen_util.dart';
 export 'package:flutter/material.dart';

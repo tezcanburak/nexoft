@@ -4,7 +4,9 @@ import 'package:nexoft/home/repository/home_repository.dart';
 part 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
-  final HomeRepository _homeRepository;
+  final HomeRepository homeRepository;
 
-  HomeCubit(this._homeRepository) : super(const HomeState());
+  HomeCubit({required this.homeRepository}) : super(const HomeState());
+
+  Future<void> getAllUserList() async {}
 }
