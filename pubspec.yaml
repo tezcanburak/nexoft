@@ -33,8 +33,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
-flutter_intl:
-  enabled: true
 
   assets:
+    - assets/png/
     - assets/svg/
