@@ -20,21 +20,45 @@ class HomeRepository {
       ApiConstants.userUrl,
       queryParameters: {'take': 10},
     );
-    ApiResult<List<User>> apiResult = ApiResult<List<User>>.fromJson(
-      response.data,
-      (dynamic jsonData) => (jsonData as List).map((e) => User.fromJson(e)).toList(),
-    );
 
-    return apiResult;
+    // Check if response indicates success
+    if (response.statusCode == 200) {
+      // Extract the list of users from the 'data' object
+      final userData = response.data['data'];
+      List<User> userList = (userData['users'] as List).map((e) => User.fromJson(e)).toList();
+
+      // Create ApiResult with the mapped user list
+      ApiResult<List<User>> apiResult = ApiResult<List<User>>.fromJson(
+        response.data,
+        (dynamic jsonData) => userList,
+      );
+
+      return apiResult;
+    } else {
+      // Handle error response
+      throw Exception('Failed to fetch users');
+    }
   }
 
   Future<bool> createUser(User user) async {
-    final Response response = await dioC!.post(ApiConstants.userUrl,data: user.toJson() );
+    try {
+      final Response response = await dioC!.post(
+        ApiConstants.userUrl,
+        data: user.toJson(),
+      );
 
-     User? userResult = User.fromJson(response.data);
-    if (userResult.id != null && userResult.id!.isNotEmpty) {
-      return true;
+      // Check if the response is null or the status code indicates success (2xx range)
+      if (response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300) {
+        // User creation successful
+        return true;
+      } else {
+        // User creation failed
+        return false;
+      }
+    } catch (e) {
+      // Handle any errors that occurred during the API call
+      print('Error creating user: $e');
+      return false;
     }
-    return false;
   }
 }

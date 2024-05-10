@@ -126,91 +126,97 @@ class _UserList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
-      buildWhen: (prev, curr) => prev.filteredUserList != curr.filteredUserList,
+      buildWhen: (prev, curr) => prev.filteredUserList != curr.filteredUserList || prev.fetchStatus != curr.fetchStatus,
       builder: (context, state) {
-        if (state.filteredUserList.isNotEmpty) {
-          return ListView.separated(
-            itemCount: state.filteredUserList.length,
-            shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            itemBuilder: (context, index) {
-              var user = state.filteredUserList[index];
-              return InkWell(
-                onTap: () => Navigator.push(context, _animatedRoute(true, user)),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: ColorConstants.white,
-                  ),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 20),
-                      Container(
-                        height: 34,
-                        width: 34,
-                        decoration: const BoxDecoration(
-                          color: Colors.black,
-                          shape: BoxShape.circle,
+        if (state.fetchStatus == Status.inProgress) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          if (state.filteredUserList.isNotEmpty) {
+            return ListView.separated(
+              itemCount: state.filteredUserList.length,
+              shrinkWrap: true,
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              itemBuilder: (context, index) {
+                var user = state.filteredUserList[index];
+                return InkWell(
+                  onTap: () => Navigator.push(context, _animatedRoute(true, user)),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: ColorConstants.white,
+                    ),
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 20),
+                        Container(
+                          height: 34,
+                          width: 34,
+                          decoration: const BoxDecoration(
+                            color: Colors.black,
+                            shape: BoxShape.circle,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 13),
-                          Text(
-                            user.firstName ?? '',
-                            style: CommonStyles.bodyLargeBlack(),
-                          ),
-                          Text(
-                            user.phoneNumber ?? '',
-                            style: CommonStyles.bodyLargeGrey(),
-                          ),
-                          const SizedBox(height: 13),
-                        ],
-                      ),
-                      const SizedBox(width: 20),
-                    ],
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 13),
+                            Text(
+                              user.firstName ?? '',
+                              style: CommonStyles.bodyLargeBlack(),
+                            ),
+                            Text(
+                              user.phoneNumber ?? '',
+                              style: CommonStyles.bodyLargeGrey(),
+                            ),
+                            const SizedBox(height: 13),
+                          ],
+                        ),
+                        const SizedBox(width: 20),
+                      ],
+                    ),
                   ),
+                );
+              },
+              separatorBuilder: (context, index) => const SizedBox(height: 20),
+            );
+          }
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/png/profile_picture.png',
+                width: 60,
+                height: 60,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                AppLocalizations.of(context)!.noContacts,
+                textAlign: TextAlign.center,
+                style: CommonStyles.titleLargeBlack(),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                AppLocalizations.of(context)!.addContactsText,
+                textAlign: TextAlign.center,
+                style: CommonStyles.bodyLargeBlack(),
+              ),
+              TextButton(
+                onPressed: () => Navigator.push(context, _animatedRoute(false, null)),
+                child: Text(
+                  AppLocalizations.of(context)!.createContact,
+                  textAlign: TextAlign.center,
+                  style: CommonStyles.bodyLargeBlue(),
                 ),
-              );
-            },
-            separatorBuilder: (context, index) => const SizedBox(height: 20),
+              ),
+            ],
           );
         }
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/png/profile_picture.png',
-              width: 60,
-              height: 60,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              AppLocalizations.of(context)!.noContacts,
-              textAlign: TextAlign.center,
-              style: CommonStyles.titleLargeBlack(),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              AppLocalizations.of(context)!.addContactsText,
-              textAlign: TextAlign.center,
-              style: CommonStyles.bodyLargeBlack(),
-            ),
-            TextButton(
-              onPressed: () => Navigator.push(context, _animatedRoute(false, null)),
-              child: Text(
-                AppLocalizations.of(context)!.createContact,
-                textAlign: TextAlign.center,
-                style: CommonStyles.bodyLargeBlue(),
-              ),
-            ),
-          ],
-        );
       },
     );
   }

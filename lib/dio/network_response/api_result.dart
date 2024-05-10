@@ -22,7 +22,7 @@ class ApiResult<T> {
     return ApiResult<T>(
       data: parsedData,
       status: json['status'] as int?,
-      messages: json['messages'] as List<String>?,
+      messages: (json['messages'] as List<dynamic>?)?.map((json) => json as String).toList() ?? [],
       success: json['success'] as bool,
     );
   }

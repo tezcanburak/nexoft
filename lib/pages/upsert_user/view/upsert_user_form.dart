@@ -38,7 +38,7 @@ class _UpsertUserFormState extends State<UpsertUserForm> {
     }
   }
 
-  void takePhoto()  async {
+  void takePhoto() async {
     var storageStatus = await Permission.camera.status;
     if (!storageStatus.isGranted) {
       await Permission.camera.request();
@@ -167,7 +167,7 @@ class _UpsertUserFormState extends State<UpsertUserForm> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Text(
-                'Alice',
+                widget.user?.firstName ?? '',
                 style: CommonStyles.bodyLargeBlack(),
               ),
             ),
@@ -175,7 +175,7 @@ class _UpsertUserFormState extends State<UpsertUserForm> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Text(
-                'Wellington',
+                widget.user?.lastName ?? '',
                 style: CommonStyles.bodyLargeBlack(),
               ),
             ),
@@ -183,7 +183,7 @@ class _UpsertUserFormState extends State<UpsertUserForm> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Text(
-                '+1234567890',
+                widget.user?.phoneNumber ?? '',
                 style: CommonStyles.bodyLargeBlack(),
               ),
             ),
@@ -320,17 +320,26 @@ class _CancelEditDoneButtons extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            TextButton(
-              onPressed: isUpdate == false && state.isValid
-                  ? () {
-                      context.read<HomeCubit>().createUserRequested();
-                    }
-                  : null,
-              child: Text(
-                isUpdate ? AppLocalizations.of(context)!.edit : AppLocalizations.of(context)!.done,
-                style: context.read<HomeCubit>().state.isValid ? CommonStyles.bodyLargeBlue() : CommonStyles.bodyLargeGrey(),
+            if (isUpdate)
+              TextButton(
+                onPressed: () {},
+                child: Text(
+                  isUpdate ? AppLocalizations.of(context)!.edit : AppLocalizations.of(context)!.done,
+                  style: CommonStyles.bodyLargeBlue(),
+                ),
               ),
-            ),
+            if (!isUpdate)
+              TextButton(
+                onPressed: state.isValid
+                    ? () {
+                        context.read<HomeCubit>().createUserRequested();
+                      }
+                    : null,
+                child: Text(
+                  AppLocalizations.of(context)!.done,
+                  style: context.read<HomeCubit>().state.isValid ? CommonStyles.bodyLargeBlue() : CommonStyles.bodyLargeGrey(),
+                ),
+              ),
           ],
         );
       },

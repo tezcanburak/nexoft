@@ -43,13 +43,11 @@ class DioClient {
     ProgressCallback? onReceiveProgress,
   }) async {
     try {
+      options ??= Options();
+      options.headers ??= {};
 
-        options ??= Options();
-        options.headers ??= {};
-
-        // Add the token to the headers
-        options.headers!['ApiKey'] =  'e2bbbb1c-024d-4f26-9abe-e7874cbc8937';
-
+      // Add the token to the headers
+      options.headers!['ApiKey'] = 'e2bbbb1c-024d-4f26-9abe-e7874cbc8937';
 
       final Response response = await _dio.get(
         url,
