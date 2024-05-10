@@ -8,5 +8,10 @@
   "edit": "Düzenle",
   "deleteAccount": "Hesabı Sil",
   "noContacts": "Kayıtlı Kişi Bulunamadı",
-  "search": "İsme göre ara"
+  "search": "İsme göre ara",
+  "lessThan2": "2 Karakterden daha az olamaz!",
+  "lessThan3": "3 Karakterden daha az olamaz!",
+  "lessThan5": "5 Karakterden daha az olamaz!",
+  "moreThan11": "11 Karakterden daha fazla olamaz!",
+  "moreThan50": "50 Karakterden daha fazla olamaz!"
 }
