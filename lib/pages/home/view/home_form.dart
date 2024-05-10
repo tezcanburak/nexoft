@@ -8,20 +8,43 @@ class HomeForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _ContactsAndAddButton(),
-          const SizedBox(height: 16),
-          _SearchBarWidget(),
-          Expanded(
-            child: _UserList(),
-          )
-        ],
+    return BlocListener<HomeCubit, HomeState>(
+      listener: (context, state) {
+        if (state.fetchStatus == Status.failure) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              const SnackBar(
+                duration: Duration(seconds: 1),
+                content: Text('There is an error!'),
+              ),
+            );
+        } else if (state.fetchStatus == Status.missingInfo) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              const SnackBar(
+                duration: Duration(seconds: 1),
+                content: Text('There is an error!'),
+              ),
+            );
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _ContactsAndAddButton(),
+            const SizedBox(height: 16),
+            _SearchBarWidget(),
+            Expanded(
+              child: _UserList(),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -74,7 +97,10 @@ class _SearchBarWidget extends StatelessWidget {
           prefixIconConstraints: const BoxConstraints(maxHeight: 21),
           prefixIcon: Padding(
             padding: const EdgeInsets.only(left: 12, right: 15),
-            child: SvgPicture.asset('assets/svg/search_icon.svg'),
+            child: SvgPicture.asset(
+              'assets/svg/search_icon.svg',
+              color: _searchController.text.trim().isNotEmpty ? ColorConstants.black : null,
+            ),
           ),
           suffixIcon: IconButton(
             onPressed: () {

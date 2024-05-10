@@ -49,7 +49,7 @@ class User {
       firstName: json['firstName'],
       phoneNumber: json['phoneNumber'],
       profileImageUrl: json['profileImageUrl'],
-      createdAt: json['createdAt'],
+      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
     );
   }
 
@@ -59,6 +59,6 @@ class User {
         'firstName': firstName,
         'phoneNumber': phoneNumber,
         'profileImageUrl': profileImageUrl,
-        'createdAt': createdAt,
+        'createdAt': createdAt.toString(),
       };
 }

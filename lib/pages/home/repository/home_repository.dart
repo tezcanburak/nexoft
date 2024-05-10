@@ -18,10 +18,7 @@ class HomeRepository {
   Future<ApiResult<List<User>?>> getAllUsers() async {
     final Response response = await dioC!.get(
       ApiConstants.userUrl,
-      queryParameters: {
-        'accept': 'text/plain',
-        'ApiKey': '49fbc414-78fb-4fd4-953d-be210be2a829',
-      },
+      queryParameters: {'take': 10},
     );
     ApiResult<List<User>> apiResult = ApiResult<List<User>>.fromJson(
       response.data,
@@ -29,5 +26,15 @@ class HomeRepository {
     );
 
     return apiResult;
+  }
+
+  Future<bool> createUser(User user) async {
+    final Response response = await dioC!.post(ApiConstants.userUrl,data: user.toJson() );
+
+     User? userResult = User.fromJson(response.data);
+    if (userResult.id != null && userResult.id!.isNotEmpty) {
+      return true;
+    }
+    return false;
   }
 }

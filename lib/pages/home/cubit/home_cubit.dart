@@ -1,4 +1,6 @@
 import 'package:nexoft/exports.dart';
+import 'package:nexoft/model/name.dart';
+import 'package:nexoft/model/phone_number.dart';
 import 'package:nexoft/model/user.dart';
 import 'package:nexoft/dio/network_response/api_result.dart';
 import 'package:nexoft/pages/home/repository/home_repository.dart';
@@ -78,5 +80,92 @@ class HomeCubit extends Cubit<HomeState> {
         }
       },
     );
+  }
+
+  Future<void> createUserRequested() async {
+    emit(
+      state.copyWith(
+        fetchStatus: Status.inProgress,
+      ),
+    );
+    User user = User(
+      firstName: state.firstName.value,
+      lastName: state.lastName.value,
+      phoneNumber: state.phoneNumber.value,
+      profileImageUrl: null,
+    );
+
+    bool isSuccess = await homeRepository.createUser(user);
+
+    if (isSuccess) {
+      emit(
+        state.copyWith(
+          createStatus: Status.success,
+        ),
+      );
+    } else {
+      emit(
+        state.copyWith(
+          createStatus: Status.failure,
+        ),
+      );
+    }
+  }
+
+  void firstNameChanged(String value) {
+    var firstName = Name(value: value).validator();
+    emit(
+      state.copyWith(
+        firstName: firstName,
+        isValid: isValid(
+          firstName,
+          state.lastName,
+          state.phoneNumber,
+        ),
+      ),
+    );
+  }
+
+  void lastNameChanged(String value) {
+    var lastName = Name(value: value).validator();
+    emit(
+      state.copyWith(
+        lastName: lastName,
+        isValid: isValid(
+          state.firstName,
+          lastName,
+          state.phoneNumber,
+        ),
+      ),
+    );
+  }
+
+  void phoneNumberChanged(String value) {
+    var phoneNumber = PhoneNumber(value: value).validator();
+    emit(
+      state.copyWith(
+        phoneNumber: phoneNumber,
+        isValid: isValid(
+          state.firstName,
+          state.lastName,
+          phoneNumber,
+        ),
+      ),
+    );
+  }
+
+  bool isValid(
+    Name? firstName,
+    Name? lastName,
+    PhoneNumber? phoneNumber,
+  ) {
+    if (firstName != null && lastName != null && phoneNumber != null) {
+      if (firstName.value.trim() != '' && lastName.value.trim() != '' && phoneNumber.value.trim() != '') {
+        if (firstName.validator()?.showError == false && lastName.validator()?.showError == false && phoneNumber.validator()?.showError == false) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }
