@@ -1,7 +1,7 @@
 import 'package:nexoft/exports.dart';
 import 'package:nexoft/model/name.dart';
-import 'package:nexoft/model/phone_number.dart';
 import 'package:nexoft/model/user.dart';
+import 'package:nexoft/model/phone_number.dart';
 import 'package:nexoft/dio/network_response/api_result.dart';
 import 'package:nexoft/pages/home/repository/home_repository.dart';
 
@@ -110,6 +110,54 @@ class HomeCubit extends Cubit<HomeState> {
         ),
       );
     }
+  }
+
+  Future<void> deleteUserRequested(String userId) async {
+    emit(
+      state.copyWith(
+        fetchStatus: Status.inProgress,
+      ),
+    );
+
+    bool isSuccess = await homeRepository.deleteUser(userId);
+
+    if (isSuccess) {
+      emit(
+        state.copyWith(
+          deleteStatus: Status.success,
+        ),
+      );
+    } else {
+      emit(
+        state.copyWith(
+          deleteStatus: Status.failure,
+        ),
+      );
+    }
+  }
+
+  void selectedUserChanged(User selectedUser) {
+    emit(
+      state.copyWith(
+        selectedUser: selectedUser,
+      ),
+    );
+  }
+
+  void isUpdateStatusChanged(bool isUpdate) {
+    emit(
+      state.copyWith(
+        isUpdate: isUpdate,
+      ),
+    );
+  }
+
+  void isEditableStatusChanged(bool isEditable) {
+    emit(
+      state.copyWith(
+        isEditable: isEditable,
+      ),
+    );
   }
 
   void firstNameChanged(String value) {

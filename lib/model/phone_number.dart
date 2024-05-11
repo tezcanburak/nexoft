@@ -26,16 +26,18 @@ class PhoneNumber extends Equatable {
 
   PhoneNumber? validator() {
     if (value != '') {
-      RegExp turkishPhoneNumberRegExp = RegExp(r'^(5\d{9})$');
+      return PhoneNumber(value: value, showError: false);
+
+      /* RegExp turkishPhoneNumberRegExp = RegExp(r'^(d{10})$');
       var replacedValue = value.replaceAll(' ', '');
       String phoneNumber = replacedValue; // Example phone number
       if (turkishPhoneNumberRegExp.hasMatch(phoneNumber)) {
         return PhoneNumber(value: replacedValue, showError: false);
       } else {
         return PhoneNumber(value: replacedValue, showError: true, errorMessage: 'invalid');
-      }
+      }*/
     }
-    return PhoneNumber(value: value, showError: false);
+    return const PhoneNumber(value: '', showError: true, errorMessage: 'invalid');
   }
 
   @override

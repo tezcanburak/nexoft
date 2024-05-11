@@ -74,19 +74,12 @@ class DioClient {
   }) async {
     try {
       List<Item> listOf = await _readAll();
-      String token = "";
-      if (listOf.isNotEmpty) {
-        Item? tokenItem = listOf.firstWhere((item) => item.key == 'token');
-        token = tokenItem.value;
-      }
 
-      if (token != "") {
-        options ??= Options();
-        options.headers ??= {};
+      options ??= Options();
+      options.headers ??= {};
 
-        // Add the token to the headers
-        options.headers!['Token'] = token;
-      }
+      // Add the token to the headers
+      options.headers!['ApiKey'] = 'e2bbbb1c-024d-4f26-9abe-e7874cbc8937';
 
       final Response response = await _dio.post(
         url,
@@ -96,6 +89,63 @@ class DioClient {
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+  // Put:-----------------------------------------------------------------------
+  Future<Response> put(
+      String url, {
+        data,
+        Map<String, dynamic>? queryParameters,
+        Options? options,
+        CancelToken? cancelToken,
+        ProgressCallback? onSendProgress,
+        ProgressCallback? onReceiveProgress,
+      }) async {
+    try {
+      options ??= Options();
+      options.headers ??= {};
+
+      // Add the token to the headers
+      options.headers!['ApiKey'] = 'e2bbbb1c-024d-4f26-9abe-e7874cbc8937';
+
+      final Response response = await _dio.put(
+        url,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+        onSendProgress: onSendProgress,
+        onReceiveProgress: onReceiveProgress,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+  // Delete:-----------------------------------------------------------------------
+  Future<Response> delete(
+      String url, {
+        Map<String, dynamic>? queryParameters,
+        Options? options,
+        CancelToken? cancelToken,
+        ProgressCallback? onReceiveProgress,
+      }) async {
+    try {
+      options ??= Options();
+      options.headers ??= {};
+
+      // Add the token to the headers
+      options.headers!['ApiKey'] = 'e2bbbb1c-024d-4f26-9abe-e7874cbc8937';
+
+      final Response response = await _dio.delete(
+        url,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
       );
       return response;
     } catch (e) {

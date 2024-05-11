@@ -30,7 +30,9 @@ class CommonDecorations {
         ),
       ],
     );
-  } static BoxDecoration pageColorBorder15() {
+  }
+
+  static BoxDecoration pageColorBorder15() {
     return BoxDecoration(
       color: ColorConstants.pageColor,
       borderRadius: BorderRadius.circular(15),
@@ -51,6 +53,16 @@ class CommonDecorations {
         borderRadius: BorderRadius.circular(15),
         borderSide: BorderSide(color: ColorConstants.black, width: 1),
       ),
+    );
+  }
+
+  static InputDecoration textFormFieldUnderlineDecoration(String hintText) {
+    return InputDecoration(
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+      hintText: hintText,
+      hintStyle: CommonStyles.bodyLargeGrey(),
+      disabledBorder: const UnderlineInputBorder(),
     );
   }
 }

@@ -61,7 +61,10 @@ class _ContactsAndAddButton extends StatelessWidget {
         ),
         const Spacer(),
         InkWell(
-          onTap: () => Navigator.push(context, _animatedRoute(false, null)),
+          onTap: () {
+            context.read<HomeCubit>().isUpdateStatusChanged(false);
+            Navigator.push(context, _animatedRoute());
+          },
           child: SvgPicture.asset('assets/svg/blue_plus_icon.svg'),
         ),
       ],
@@ -141,7 +144,11 @@ class _UserList extends StatelessWidget {
               itemBuilder: (context, index) {
                 var user = state.filteredUserList[index];
                 return InkWell(
-                  onTap: () => Navigator.push(context, _animatedRoute(true, user)),
+                  onTap: () {
+                    context.read<HomeCubit>().isUpdateStatusChanged(true);
+                    context.read<HomeCubit>().selectedUserChanged(user);
+                    Navigator.push(context, _animatedRoute());
+                  },
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
@@ -207,7 +214,10 @@ class _UserList extends StatelessWidget {
                 style: CommonStyles.bodyLargeBlack(),
               ),
               TextButton(
-                onPressed: () => Navigator.push(context, _animatedRoute(false, null)),
+                onPressed: () {
+                  context.read<HomeCubit>().isUpdateStatusChanged(false);
+                  Navigator.push(context, _animatedRoute());
+                },
                 child: Text(
                   AppLocalizations.of(context)!.createContact,
                   textAlign: TextAlign.center,
@@ -222,13 +232,10 @@ class _UserList extends StatelessWidget {
   }
 }
 
-Route _animatedRoute(bool isUpdate, User? user) {
+Route _animatedRoute() {
   return PageRouteBuilder(
     transitionDuration: const Duration(milliseconds: 1000),
-    pageBuilder: (context, animation, secondaryAnimation) => UpsertUserPage(
-      isUpdate: isUpdate,
-      user: user,
-    ),
+    pageBuilder: (context, animation, secondaryAnimation) => UpsertUserPage(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(0.0, 1.0);
       const end = Offset.zero;

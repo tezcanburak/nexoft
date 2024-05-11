@@ -3,21 +3,11 @@ import 'package:nexoft/exports.dart';
 import 'package:nexoft/model/user.dart';
 
 class UpsertUserPage extends StatelessWidget {
-  const UpsertUserPage({
-    super.key,
-    required this.isUpdate,
-    this.user,
-  });
+  const UpsertUserPage({super.key});
 
-  final bool isUpdate;
-  final User? user;
-
-  static Route route(bool isUpdate, User? user) {
+  static Route route() {
     return MaterialPageRoute(
-      builder: (_) => UpsertUserPage(
-        isUpdate: isUpdate,
-        user: user,
-      ),
+      builder: (_) => const UpsertUserPage(),
     );
   }
 
@@ -28,7 +18,7 @@ class UpsertUserPage extends StatelessWidget {
         preferredSize: Size.zero,
         child: AppBar(),
       ),
-      body: UpsertUserForm(isUpdate: isUpdate, user: user),
+      body: const UpsertUserForm(),
     );
   }
 }

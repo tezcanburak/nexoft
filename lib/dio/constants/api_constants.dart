@@ -12,4 +12,5 @@ class ApiConstants {
   static const int connectionTimeout = 15000;
 
   static const String userUrl = "api/User";
+  static const String uploadPhotoUrl = "api/User/UploadImage";
 }
