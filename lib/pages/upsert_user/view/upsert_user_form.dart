@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:nexoft/exports.dart';
-import 'package:nexoft/model/user.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nexoft/pages/home/cubit/home_cubit.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -51,8 +50,8 @@ class _UpsertUserFormState extends State<UpsertUserForm> {
 
     return BlocBuilder<HomeCubit, HomeState>(
       builder: (context, state) {
-        var user = state.selectedUser;
         var isUpdate = state.isUpdate;
+        var isEditable = state.isEditable;
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: CommonDecorations.commonUpsertUserPageDecoration(),
@@ -159,33 +158,12 @@ class _UpsertUserFormState extends State<UpsertUserForm> {
                 ],
               ),
               const SizedBox(height: 24),
-
-              /*       if (isUpdate) ...[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Text(
-                    user.firstName ?? '',
-                    style: CommonStyles.bodyLargeBlack(),
-                  ),
-                ),
-                _divider(30),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Text(
-                    user.lastName ?? '',
-                    style: CommonStyles.bodyLargeBlack(),
-                  ),
-                ),
-                _divider(30),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Text(
-                    user.phoneNumber ?? '',
-                    style: CommonStyles.bodyLargeBlack(),
-                  ),
-                ),
-                const SizedBox(height: 11),
-                _divider(8),
+              _FirstName(),
+              if (!isUpdate || isEditable) const SizedBox(height: 20),
+              _LastName(),
+              if (!isUpdate || isEditable) const SizedBox(height: 20),
+              _PhoneNumber(),
+              if (isUpdate && !isEditable)
                 Row(
                   children: [
                     const SizedBox(width: 8),
@@ -198,26 +176,6 @@ class _UpsertUserFormState extends State<UpsertUserForm> {
                     ),
                   ],
                 ),
-              ] else ...[
-                _FirstName(),
-                const SizedBox(height: 20),
-                _LastName(),
-                const SizedBox(height: 20),
-                _PhoneNumber(),
-              ],
-                Divider _divider(double height) {
-                  return Divider(
-                    height: height,
-                    thickness: 1,
-                    color: ColorConstants.grey,
-                  );
-                }
-              */
-              _FirstName(),
-              if (!isUpdate) const SizedBox(height: 20),
-              _LastName(),
-              if (!isUpdate) const SizedBox(height: 20),
-              _PhoneNumber(),
               const Spacer(),
             ],
           ),
@@ -231,23 +189,29 @@ class _FirstName extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
-      buildWhen: (prev, curr) => prev.firstName != curr.firstName || prev.isUpdate != curr.isUpdate || prev.selectedUser != curr.selectedUser,
+      buildWhen: (prev, curr) =>
+          prev.firstName != curr.firstName ||
+          prev.isUpdate != curr.isUpdate ||
+          prev.selectedUser != curr.selectedUser ||
+          prev.isEditable != curr.isEditable,
       builder: (context, state) {
         var isUpdate = state.isUpdate;
+        var isEditable = state.isEditable;
         return Container(
-          decoration: isUpdate ? null : CommonDecorations.pageColorBorder15(),
+          decoration: isUpdate && !isEditable ? null : CommonDecorations.pageColorBorder15(),
           child: TextFormField(
             textAlign: TextAlign.left,
-            enabled: isUpdate ? false : true,
             cursorColor: ColorConstants.blue,
             keyboardType: TextInputType.text,
             style: CommonStyles.bodyLargeBlack(),
+            enabled: isUpdate && !isEditable ? false : true,
             validator: (value) => state.firstName.errorMessage,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             controller: isUpdate ? TextEditingController(text: state.selectedUser.firstName) : null,
             onChanged: (firstName) => context.read<HomeCubit>().firstNameChanged(firstName.trim()),
-            decoration:
-                isUpdate ? CommonDecorations.textFormFieldUnderlineDecoration('firstName') : CommonDecorations.textFormFieldDecoration('firstName'),
+            decoration: isUpdate && !isEditable
+                ? CommonDecorations.textFormFieldUnderlineDecoration('firstName')
+                : CommonDecorations.textFormFieldDecoration('firstName'),
           ),
         );
       },
@@ -259,23 +223,29 @@ class _LastName extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
-      buildWhen: (prev, curr) => prev.lastName != curr.lastName || prev.isUpdate != curr.isUpdate || prev.selectedUser != curr.selectedUser,
+      buildWhen: (prev, curr) =>
+          prev.lastName != curr.lastName ||
+          prev.isUpdate != curr.isUpdate ||
+          prev.selectedUser != curr.selectedUser ||
+          prev.isEditable != curr.isEditable,
       builder: (context, state) {
         var isUpdate = state.isUpdate;
+        var isEditable = state.isEditable;
         return Container(
-          decoration: isUpdate ? null : CommonDecorations.pageColorBorder15(),
+          decoration: isUpdate && !isEditable ? null : CommonDecorations.pageColorBorder15(),
           child: TextFormField(
-            enabled: isUpdate ? false : true,
-            controller: isUpdate ? TextEditingController(text: state.selectedUser.lastName) : null,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (value) => state.lastName.errorMessage,
-            onChanged: (lastName) => context.read<HomeCubit>().lastNameChanged(lastName.trim()),
-            keyboardType: TextInputType.text,
-            style: CommonStyles.bodyLargeBlack(),
-            decoration:
-                isUpdate ? CommonDecorations.textFormFieldUnderlineDecoration('lastName') : CommonDecorations.textFormFieldDecoration('lastName'),
             textAlign: TextAlign.left,
             cursorColor: ColorConstants.blue,
+            keyboardType: TextInputType.text,
+            enabled: isUpdate && !isEditable ? false : true,
+            validator: (value) => state.lastName.errorMessage,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            controller: isUpdate ? TextEditingController(text: state.selectedUser.lastName) : null,
+            onChanged: (lastName) => context.read<HomeCubit>().lastNameChanged(lastName.trim()),
+            style: CommonStyles.bodyLargeBlack(),
+            decoration: isUpdate && !isEditable
+                ? CommonDecorations.textFormFieldUnderlineDecoration('lastName')
+                : CommonDecorations.textFormFieldDecoration('lastName'),
           ),
         );
       },
@@ -290,20 +260,25 @@ class _PhoneNumber extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
-      buildWhen: (prev, curr) => prev.phoneNumber != curr.phoneNumber || prev.isUpdate != curr.isUpdate || prev.selectedUser != curr.selectedUser,
+      buildWhen: (prev, curr) =>
+          prev.phoneNumber != curr.phoneNumber ||
+          prev.isUpdate != curr.isUpdate ||
+          prev.selectedUser != curr.selectedUser ||
+          prev.isEditable != curr.isEditable,
       builder: (context, state) {
         var isUpdate = state.isUpdate;
+        var isEditable = state.isEditable;
         return Container(
-          decoration: isUpdate ? null : CommonDecorations.pageColorBorder15(),
+          decoration: isUpdate && !isEditable ? null : CommonDecorations.pageColorBorder15(),
           child: TextFormField(
             textAlign: TextAlign.left,
             cursorColor: ColorConstants.blue,
-            enabled: isUpdate ? false : true,
+            enabled: isUpdate && !isEditable ? false : true,
             keyboardType: TextInputType.phone,
             style: CommonStyles.bodyLargeBlack(),
             controller: isUpdate ? TextEditingController(text: state.selectedUser.phoneNumber) : null,
             onChanged: (phoneNumber) => context.read<HomeCubit>().phoneNumberChanged(phoneNumber),
-            decoration: isUpdate
+            decoration: isUpdate && !isEditable
                 ? CommonDecorations.textFormFieldUnderlineDecoration('phoneNumber')
                 : CommonDecorations.textFormFieldDecoration('phoneNumber'),
           ),
@@ -325,6 +300,7 @@ class _CancelEditDoneButtons extends StatelessWidget {
       builder: (context, state) {
         var isUpdate = state.isUpdate;
         var isValid = state.isValid;
+        var isEditable = state.isEditable;
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -342,9 +318,15 @@ class _CancelEditDoneButtons extends StatelessWidget {
               ),
             if (isUpdate)
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  if (isEditable) {
+                    context.read<HomeCubit>().isEditableStatusChanged(false);
+                  } else {
+                    context.read<HomeCubit>().isEditableStatusChanged(true);
+                  }
+                },
                 child: Text(
-                  isUpdate ? AppLocalizations.of(context)!.edit : AppLocalizations.of(context)!.done,
+                  isEditable ? AppLocalizations.of(context)!.done : AppLocalizations.of(context)!.edit,
                   style: CommonStyles.bodyLargeBlue(),
                 ),
               )

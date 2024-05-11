@@ -1,5 +1,4 @@
 import 'package:nexoft/exports.dart';
-import 'package:nexoft/model/user.dart';
 import 'package:nexoft/pages/home/cubit/home_cubit.dart';
 import 'package:nexoft/pages/upsert_user/view/upsert_user_page.dart';
 
@@ -63,6 +62,9 @@ class _ContactsAndAddButton extends StatelessWidget {
         InkWell(
           onTap: () {
             context.read<HomeCubit>().isUpdateStatusChanged(false);
+
+            /// This (false) is for if user use back button in the phone, and then go to another person.
+            context.read<HomeCubit>().isEditableStatusChanged(false);
             Navigator.push(context, _animatedRoute());
           },
           child: SvgPicture.asset('assets/svg/blue_plus_icon.svg'),
@@ -146,6 +148,9 @@ class _UserList extends StatelessWidget {
                 return InkWell(
                   onTap: () {
                     context.read<HomeCubit>().isUpdateStatusChanged(true);
+
+                    /// This (false) is for if user use back button in the phone, and then go to another person.
+                    context.read<HomeCubit>().isEditableStatusChanged(false);
                     context.read<HomeCubit>().selectedUserChanged(user);
                     Navigator.push(context, _animatedRoute());
                   },
@@ -216,6 +221,9 @@ class _UserList extends StatelessWidget {
               TextButton(
                 onPressed: () {
                   context.read<HomeCubit>().isUpdateStatusChanged(false);
+
+                  /// This (false) is for if user use back button in the phone, and then go to another person.
+                  context.read<HomeCubit>().isEditableStatusChanged(false);
                   Navigator.push(context, _animatedRoute());
                 },
                 child: Text(
@@ -235,7 +243,7 @@ class _UserList extends StatelessWidget {
 Route _animatedRoute() {
   return PageRouteBuilder(
     transitionDuration: const Duration(milliseconds: 1000),
-    pageBuilder: (context, animation, secondaryAnimation) => UpsertUserPage(),
+    pageBuilder: (context, animation, secondaryAnimation) => const UpsertUserPage(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(0.0, 1.0);
       const end = Offset.zero;

@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:nexoft/dio/constants/api_constants.dart';
-import 'package:nexoft/model/shared_preferences/item.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class DioClient {
   final Dio _dio;
@@ -12,26 +10,6 @@ class DioClient {
       ..options.connectTimeout = const Duration(seconds: 1500)
       ..options.receiveTimeout = const Duration(seconds: 1500)
       ..options.responseType = ResponseType.json;
-  }
-
-  final _storage = const FlutterSecureStorage();
-
-  IOSOptions _getIOSOptions() => const IOSOptions(
-        accountName: 'flutter_secure_storage_service',
-      );
-
-  AndroidOptions _getAndroidOptions() => const AndroidOptions(
-        encryptedSharedPreferences: true,
-      );
-
-  Future<List<Item>> _readAll() async {
-    const storage = FlutterSecureStorage();
-
-    final all = await storage.readAll(
-      iOptions: _getIOSOptions(),
-      aOptions: _getAndroidOptions(),
-    );
-    return all.entries.map((entry) => Item(entry.key, entry.value)).toList(growable: false);
   }
 
   // Get:-----------------------------------------------------------------------
@@ -73,8 +51,6 @@ class DioClient {
     ProgressCallback? onReceiveProgress,
   }) async {
     try {
-      List<Item> listOf = await _readAll();
-
       options ??= Options();
       options.headers ??= {};
 
@@ -95,16 +71,17 @@ class DioClient {
       rethrow;
     }
   }
+
   // Put:-----------------------------------------------------------------------
   Future<Response> put(
-      String url, {
-        data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onSendProgress,
-        ProgressCallback? onReceiveProgress,
-      }) async {
+    String url, {
+    data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
     try {
       options ??= Options();
       options.headers ??= {};
@@ -126,14 +103,15 @@ class DioClient {
       rethrow;
     }
   }
+
   // Delete:-----------------------------------------------------------------------
   Future<Response> delete(
-      String url, {
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onReceiveProgress,
-      }) async {
+    String url, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onReceiveProgress,
+  }) async {
     try {
       options ??= Options();
       options.headers ??= {};

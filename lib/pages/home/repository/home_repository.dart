@@ -59,7 +59,6 @@ class HomeRepository {
       }
     } catch (e) {
       // Handle any errors that occurred during the API call
-      print('Error creating user: $e');
       return false;
     }
   }
@@ -81,7 +80,6 @@ class HomeRepository {
       }
     } catch (e) {
       // Handle any errors that occurred during the API call
-      print('Error updating user: $e');
       return false;
     }
   }
@@ -102,7 +100,6 @@ class HomeRepository {
       }
     } catch (e) {
       // Handle any errors that occurred during the API call
-      print('Error deleting user: $e');
       return false;
     }
   }
@@ -131,7 +128,6 @@ class HomeRepository {
       }
     } catch (e) {
       // Handle any errors that occurred during the photo upload
-      print('Error uploading photo: $e');
       return null;
     }
   }
@@ -157,7 +153,6 @@ class HomeRepository {
       }
     } catch (e) {
       // Handle any errors that occurred during the API call
-      print('Error creating user: $e');
       return false;
     }
   }
@@ -176,7 +171,6 @@ class HomeRepository {
       }
     } catch (e) {
       // Handle any errors that occurred during the process
-      print('Error uploading photo and creating user: $e');
       return false;
     }
   }
