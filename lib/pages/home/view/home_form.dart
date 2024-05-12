@@ -78,8 +78,15 @@ class _ContactsAndAddButton extends StatelessWidget {
   }
 }
 
-class _SearchBarWidget extends StatelessWidget {
+class _SearchBarWidget extends StatefulWidget {
+  @override
+  State<_SearchBarWidget> createState() => _SearchBarWidgetState();
+}
+
+class _SearchBarWidgetState extends State<_SearchBarWidget> {
   final TextEditingController _searchController = TextEditingController();
+
+  bool isSearchStarted = false;
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +94,16 @@ class _SearchBarWidget extends StatelessWidget {
     return Container(
       decoration: CommonDecorations.whiteColorBorder12(),
       child: TextField(
-        onChanged: (value) => cubit.filterUserListRequested(value.trim()),
+        onChanged: (value) {
+          cubit.filterUserListRequested(value.trim());
+          setState(() {
+            if (value == '') {
+              isSearchStarted = false;
+              return;
+            }
+            isSearchStarted = true;
+          });
+        },
         cursorColor: ColorConstants.black,
         style: CommonStyles.bodyLargeBlack(),
         controller: _searchController,
@@ -123,56 +139,75 @@ class _SearchBarWidget extends StatelessWidget {
 }
 
 class _UserList extends StatelessWidget {
+  final _scrollController = ScrollController();
+
+  void _scrollListener(BuildContext context) {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      context.read<HomeCubit>().getUsersList();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    _scrollController.addListener(() {
+      _scrollListener(context);
+    });
     return BlocBuilder<HomeCubit, HomeState>(
       buildWhen: (prev, curr) => prev.filteredUserList != curr.filteredUserList || prev.fetchStatus != curr.fetchStatus,
       builder: (context, state) {
-        if (state.fetchStatus == Status.inProgress) {
-          return const CustomCircularProgressIndicator();
-        } else {
-          if (state.filteredUserList.isNotEmpty) {
-            return ListView.separated(
-              itemCount: state.filteredUserList.length,
-              shrinkWrap: true,
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              itemBuilder: (context, contactIndex) {
-                var user = state.filteredUserList[contactIndex];
-                return InkWell(
-                  onTap: () {
-                    context.read<HomeCubit>().isUpdateStatusChanged(true);
+        if (state.filteredUserList.isNotEmpty || state.fetchStatus == Status.inProgress) {
+          return SingleChildScrollView(
+            controller: _scrollController,
+            child: SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListView.separated(
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: state.filteredUserList.length,
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    itemBuilder: (context, contactIndex) {
+                      var user = state.filteredUserList[contactIndex];
+                      return InkWell(
+                        onTap: () {
+                          context.read<HomeCubit>().isUpdateStatusChanged(true);
 
-                    /// This (false) is for if user use back button in the phone, and then pick another person.
-                    context.read<HomeCubit>().isUserEditableStatusChanged(false);
-                    context.read<HomeCubit>().selectedUserChanged(user);
-                    Navigator.push(context, _animatedRoute());
-                  },
-                  child: Container(
-                    decoration: CommonDecorations.whiteColorBorder12(),
-                    child: Row(
-                      children: [
-                        /// Left Padding
-                        const SizedBox(width: 20),
-                        _EachContactPhoto(user: user),
+                          /// This (false) is for if user use back button in the phone, and then pick another person.
+                          context.read<HomeCubit>().isUserEditableStatusChanged(false);
+                          context.read<HomeCubit>().selectedUserChanged(user);
+                          Navigator.push(context, _animatedRoute());
+                        },
+                        child: Container(
+                          decoration: CommonDecorations.whiteColorBorder12(),
+                          child: Row(
+                            children: [
+                              /// Left Padding
+                              const SizedBox(width: 20),
+                              _EachContactPhoto(user: user),
 
-                        /// Padding Between Contact Photo & Texts
-                        const SizedBox(width: 10),
-                        _EachNameAndPhoneNumberTexts(user: user),
+                              /// Padding Between Contact Photo & Texts
+                              const SizedBox(width: 10),
+                              _EachNameAndPhoneNumberTexts(user: user),
 
-                        /// Right Padding
-                        const SizedBox(width: 20),
-                      ],
-                    ),
+                              /// Right Padding
+                              const SizedBox(width: 20),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+
+                    /// Padding between each contact
+                    separatorBuilder: (context, index) => const SizedBox(height: 20),
                   ),
-                );
-              },
-
-              /// Padding between each contact
-              separatorBuilder: (context, index) => const SizedBox(height: 20),
-            );
-          }
-          return _ThereIsNoContactView();
+                  if (state.fetchStatus == Status.inProgress) const CustomCircularProgressIndicator(),
+                ],
+              ),
+            ),
+          );
         }
+        return _ThereIsNoContactView();
       },
     );
   }
@@ -185,16 +220,19 @@ class _EachContactPhoto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: 17,
-      backgroundColor: Colors.transparent,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(34),
       child: user.profileImageUrl != null && user.profileImageUrl!.isNotEmpty
           ? Image.network(
               user.profileImageUrl!,
+              height: 34,
+              width: 34,
               fit: BoxFit.cover,
             )
           : Image.asset(
               'assets/png/profile_picture.png',
+              height: 34,
+              width: 34,
               fit: BoxFit.cover,
             ),
     );

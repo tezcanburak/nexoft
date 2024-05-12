@@ -1,7 +1,8 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:nexoft/model/user.dart';
 import 'package:nexoft/dio/base/dio.dart';
+import 'package:nexoft/model/image_url.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:nexoft/dio/constants/api_constants.dart';
 import 'package:nexoft/dio/network_response/api_result.dart';
 
@@ -16,10 +17,10 @@ class HomeRepository {
     }
   }
 
-  Future<ApiResult<List<User>?>> getAllUsers() async {
+  Future<ApiResult<List<User>?>> getAllUsers(int skip) async {
     final Response response = await dioC!.get(
       ApiConstants.userUrl,
-      queryParameters: {'take': 10},
+      queryParameters: {'take': 10, 'skip': skip},
     );
 
     // Check if response indicates success
@@ -41,7 +42,7 @@ class HomeRepository {
     }
   }
 
-  Future<User?> createUser(User user) async {
+  Future<ApiResult<User>?> createUser(User user) async {
     try {
       final Response response = await dioC!.post(
         ApiConstants.userUrl,
@@ -51,11 +52,8 @@ class HomeRepository {
       // Check if the response is null or the status code indicates success (2xx range)
       if (response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300) {
         // User creation successful
-        final userData = response.data;
-
-        // Create ApiResult with the mapped user list
-
-        return userData;
+        var apiResult = ApiResult<User>.fromJson(response.data, (p0) => User.fromJson(p0));
+        return apiResult;
       } else {
         // User creation failed
         return null;
@@ -108,22 +106,29 @@ class HomeRepository {
   }
 
   // Method to upload photo
-  Future<String?> uploadPhoto(File photo) async {
+  Future<String?> uploadPhoto(XFile photo) async {
     try {
-      // Use Dio's FormData to upload the photo
       FormData formData = FormData.fromMap({
-        'photo': await MultipartFile.fromFile(photo.path, filename: 'photo.jpg'),
+        'image': await MultipartFile.fromFile(photo.path, filename: 'photo.jpg'),
       });
 
       final Response response = await dioC!.post(
         ApiConstants.uploadPhotoUrl, // Replace with your photo upload endpoint
         data: formData,
+        options: Options(
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            // Add any other headers if needed
+          },
+        ),
       );
 
       // Check if the status code indicates success (2xx range)
       if (response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300) {
         // Parse the response to get the image URL
-        String imageUrl = response.data['imageUrl']; // Adjust based on the actual response structure
+        var apiResult = ApiResult<ImageUrl>.fromJson(response.data, (p0) => ImageUrl.fromJson(p0));
+
+        String? imageUrl = apiResult.data?.imageUrl; // Adjust based on the actual response structure
         return imageUrl;
       } else {
         // Photo upload failed
@@ -138,7 +143,6 @@ class HomeRepository {
   // Method to create user with uploaded photo
   Future<bool> createUserWithPhoto(User user, String imageUrl) async {
     try {
-      // Create a copy of the user object with the updated profileImageUrl
       User updatedUser = user.copyWith(profileImageUrl: imageUrl);
 
       final Response response = await dioC!.post(
@@ -161,7 +165,7 @@ class HomeRepository {
   }
 
 // Method to upload photo and create user
-  Future<bool> uploadPhotoAndCreateUser(File photo, User user) async {
+  Future<bool> uploadPhotoAndCreateUser(XFile photo, User user) async {
     try {
       // Upload the photo
       String? imageUrl = await uploadPhoto(photo);

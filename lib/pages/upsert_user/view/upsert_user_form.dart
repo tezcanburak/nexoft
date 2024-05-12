@@ -68,18 +68,47 @@ class _UpsertUserFormState extends State<UpsertUserForm> {
               children: [
                 _CancelEditDoneButtons(),
                 const SizedBox(height: 25),
-                CircleAvatar(
-                  radius: size.width * 0.225,
-                  backgroundColor: Colors.transparent,
-                  child: selectedImage.pickedImage.path.isNotEmpty
-                      ? Image.file(
-                          File(selectedImage.pickedImage.path),
-                          fit: BoxFit.cover,
-                        )
-                      : Image.asset(
-                          'assets/png/profile_picture.png',
-                          fit: BoxFit.cover,
+                BlocBuilder<HomeCubit, HomeState>(
+                  builder: (context, state) {
+                    if (state.isUpdate) {
+                      return Center(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(size.width * 0.45),
+                          child: state.selectedUser.profileImageUrl != null && state.selectedUser.profileImageUrl!.isNotEmpty
+                              ? Image.network(
+                                  state.selectedUser.profileImageUrl!,
+                                  height: size.width * 0.45,
+                                  width: size.width * 0.45,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.asset(
+                                  'assets/png/profile_picture.png',
+                                  height: size.width * 0.45,
+                                  width: size.width * 0.45,
+                                  fit: BoxFit.cover,
+                                ),
                         ),
+                      );
+                    }
+                    return Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(size.width * 0.45),
+                        child: state.image != null && state.image!.path.isNotEmpty
+                            ? Image.file(
+                                File(state.image!.path),
+                                height: size.width * 0.45,
+                                width: size.width * 0.45,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.asset(
+                                'assets/png/profile_picture.png',
+                                height: size.width * 0.45,
+                                width: size.width * 0.45,
+                                fit: BoxFit.cover,
+                              ),
+                      ),
+                    );
+                  },
                 ),
 
                 /// This row is used to prevent the clickable area from stretching to the entire width.
@@ -104,7 +133,21 @@ class _UpsertUserFormState extends State<UpsertUserForm> {
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   InkWell(
-                                    onTap: takePhoto,
+                                    onTap: () async {
+                                      var storageStatus = await Permission.camera.status;
+                                      if (!storageStatus.isGranted) {
+                                        await Permission.camera.request();
+                                      }
+                                      if (storageStatus.isGranted) {
+                                        final ImagePicker picker = ImagePicker();
+                                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                                        if (image != null) {
+                                          if (!mounted) return;
+                                          context.read<HomeCubit>().setImage(image);
+                                          selectedImage.pickedImage.path;
+                                        }
+                                      }
+                                    },
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(vertical: 10),
                                       decoration: CommonDecorations.pageColorBorder10(),
@@ -121,7 +164,21 @@ class _UpsertUserFormState extends State<UpsertUserForm> {
                                   ),
                                   const SizedBox(height: 15),
                                   InkWell(
-                                    onTap: pickSingleImage,
+                                    onTap: () async {
+                                      var storageStatus = await Permission.storage.status;
+                                      if (!storageStatus.isGranted) {
+                                        await Permission.storage.request();
+                                      }
+                                      if (storageStatus.isGranted) {
+                                        final ImagePicker picker = ImagePicker();
+                                        final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+                                        if (image != null) {
+                                          if (!mounted) return;
+                                          context.read<HomeCubit>().setImage(image);
+                                          selectedImage.pickedImage.path;
+                                        }
+                                      }
+                                    },
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(vertical: 10),
                                       decoration: CommonDecorations.pageColorBorder10(),

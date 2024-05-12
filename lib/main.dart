@@ -31,7 +31,7 @@ class _AppState extends State<App> {
     return RepositoryProvider.value(
       value: _homeRepository,
       child: BlocProvider(
-        create: (context) => HomeCubit(homeRepository: _homeRepository)..getAllUserListRequested(),
+        create: (context) => HomeCubit(homeRepository: _homeRepository)..getUsersList(),
         child: const AppView(),
       ),
     );

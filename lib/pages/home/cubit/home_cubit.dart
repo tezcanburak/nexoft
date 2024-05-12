@@ -1,3 +1,4 @@
+import 'package:image_picker/image_picker.dart';
 import 'package:nexoft/exports.dart';
 import 'package:nexoft/model/name.dart';
 import 'package:nexoft/model/user.dart';
@@ -12,25 +13,25 @@ class HomeCubit extends Cubit<HomeState> {
 
   HomeCubit({required this.homeRepository}) : super(const HomeState());
 
-  Future<void> getAllUserListRequested() async {
+  Future<void> getUsersList() async {
     emit(
       state.copyWith(
         fetchStatus: Status.inProgress,
       ),
     );
 
-    ApiResult<List<User>?> apiResult = await homeRepository.getAllUsers();
+    ApiResult<List<User>?> apiResult = await homeRepository.getAllUsers(state.userList.length);
     List<User>? apiUserList = apiResult.data;
     if (apiResult.success && apiUserList != null) {
       sort(apiUserList);
-      List<User> userList = List.empty(growable: true);
-      userList.addAll(apiUserList);
+      List<User> tU = List.from(state.userList);
+      tU.addAll(apiUserList);
+
+      //It is added to show circular progress bar indicator only.
+      await Future.delayed(const Duration(seconds: 2));
+
       emit(
-        state.copyWith(
-          fetchStatus: Status.idle,
-          userList: userList,
-          filteredUserList: userList,
-        ),
+        state.copyWith(fetchStatus: Status.idle, userList: tU, filteredUserList: tU),
       );
     } else {
       emit(
@@ -53,6 +54,10 @@ class HomeCubit extends Cubit<HomeState> {
         }).toList(),
       ),
     );
+  }
+
+  void setImage(XFile image) {
+    emit(state.copyWith(image: image));
   }
 
   void sort(List<User> unSorted) {
@@ -78,23 +83,26 @@ class HomeCubit extends Cubit<HomeState> {
         createStatus: Status.inProgress,
       ),
     );
+
     User user = User(
       firstName: state.firstName.value,
       lastName: state.lastName.value,
       phoneNumber: state.phoneNumber.value,
       profileImageUrl: null,
     );
+    /// TODO: This will be handled!!!
+    bool url = await homeRepository.uploadPhotoAndCreateUser(state.image!, user);
 
-    User? createdUser = await homeRepository.createUser(user);
+    ApiResult<User>? createdUser = await homeRepository.createUser(user);
 
-    if (createdUser != null) {
+    if (createdUser != null && createdUser.success == true) {
       List<User> userList = List.from(state.userList);
-      userList.add(createdUser);
+      userList.add(createdUser.data!);
       sort(userList);
       emit(
         state.copyWith(
           userList: userList,
-          selectedUser: createdUser,
+          selectedUser: createdUser.data!,
           createStatus: Status.success,
         ),
       );
@@ -122,7 +130,7 @@ class HomeCubit extends Cubit<HomeState> {
         void newUserList = userList.removeWhere((e) => e.id == userId);*/
 
       /// TODO: Burada hata var, uyg crash alıyor!!!
-      getAllUserListRequested();
+      getUsersList();
       emit(
         state.copyWith(
           deleteStatus: Status.success,

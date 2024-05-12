@@ -3,6 +3,8 @@ part of 'home_cubit.dart';
 class HomeState extends Equatable {
   final User selectedUser;
 
+  final XFile? image;
+
   /// isValid == Each textFormField is filled.
   final bool isValid;
 
@@ -38,9 +40,11 @@ class HomeState extends Equatable {
     this.createStatus = Status.idle,
     this.deleteStatus = Status.idle,
     this.selectedUser = const User.empty(),
+    this.image,
   });
 
   HomeState copyWith({
+    XFile? image,
     bool? isValid,
     bool? isUpdate,
     bool? isUserEditable,
@@ -56,6 +60,7 @@ class HomeState extends Equatable {
     List<String>? errorMessageList,
   }) {
     return HomeState(
+      image: image ?? this.image,
       isValid: isValid ?? this.isValid,
       isUpdate: isUpdate ?? this.isUpdate,
       userList: userList ?? this.userList,
@@ -74,6 +79,7 @@ class HomeState extends Equatable {
 
   @override
   List<Object?> get props => [
+        image,
         isValid,
         userList,
         isUpdate,
