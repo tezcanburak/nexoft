@@ -66,7 +66,7 @@ class HomeCubit extends Cubit<HomeState> {
           return -1;
         } else {
           // Compare non-null values
-          return a.firstName!.compareTo(b.firstName!);
+          return a.firstName!.toLowerCase().compareTo(b.firstName!.toLowerCase());
         }
       },
     );

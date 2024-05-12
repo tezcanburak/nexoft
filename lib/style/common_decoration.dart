@@ -39,6 +39,13 @@ class CommonDecorations {
     );
   }
 
+  static BoxDecoration whiteColorBorder12() {
+    return BoxDecoration(
+      borderRadius: BorderRadius.circular(12),
+      color: ColorConstants.white,
+    );
+  }
+
   static InputDecoration textFormFieldDecoration(String hintText) {
     return InputDecoration(
       isDense: true,

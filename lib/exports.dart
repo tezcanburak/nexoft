@@ -10,3 +10,4 @@ export 'package:flutter_bloc/flutter_bloc.dart';
 export 'package:nexoft/style/common_decoration.dart';
 export 'package:nexoft/style/common_text_style.dart';
 export 'package:flutter_gen/gen_l10n/app_localizations.dart';
+export 'package:nexoft/constants/circular_progress_indicator.dart';

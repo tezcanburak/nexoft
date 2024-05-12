@@ -1,4 +1,5 @@
 import 'package:nexoft/exports.dart';
+import 'package:nexoft/model/user.dart';
 import 'package:nexoft/pages/home/cubit/home_cubit.dart';
 import 'package:nexoft/pages/upsert_user/view/upsert_user_page.dart';
 
@@ -29,6 +30,8 @@ class HomeForm extends StatelessWidget {
             );
         }
       },
+
+      /// Whole Home Body
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Column(
@@ -37,7 +40,7 @@ class HomeForm extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _ContactsAndAddButton(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 15),
             _SearchBarWidget(),
             Expanded(
               child: _UserList(),
@@ -82,10 +85,7 @@ class _SearchBarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var cubit = context.read<HomeCubit>();
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
-      ),
+      decoration: CommonDecorations.whiteColorBorder12(),
       child: TextField(
         onChanged: (value) => cubit.filterUserListRequested(value.trim()),
         cursorColor: ColorConstants.black,
@@ -94,10 +94,10 @@ class _SearchBarWidget extends StatelessWidget {
         decoration: InputDecoration(
           isDense: true,
           contentPadding: EdgeInsets.zero,
+          hintStyle: CommonStyles.bodyLargeGrey(),
+          hintText: AppLocalizations.of(context)!.search,
           border: const OutlineInputBorder(borderSide: BorderSide.none),
           enabledBorder: const OutlineInputBorder(borderSide: BorderSide.none),
-          hintText: AppLocalizations.of(context)!.search,
-          hintStyle: CommonStyles.bodyLargeGrey(),
           prefixIconConstraints: const BoxConstraints(maxHeight: 21),
           prefixIcon: Padding(
             padding: const EdgeInsets.only(left: 12, right: 15),
@@ -129,20 +129,15 @@ class _UserList extends StatelessWidget {
       buildWhen: (prev, curr) => prev.filteredUserList != curr.filteredUserList || prev.fetchStatus != curr.fetchStatus,
       builder: (context, state) {
         if (state.fetchStatus == Status.inProgress) {
-          return Center(
-            child: CircularProgressIndicator(
-              color: ColorConstants.blue,
-              backgroundColor: ColorConstants.grey,
-            ),
-          );
+          return const CustomCircularProgressIndicator();
         } else {
           if (state.filteredUserList.isNotEmpty) {
             return ListView.separated(
               itemCount: state.filteredUserList.length,
               shrinkWrap: true,
               padding: const EdgeInsets.symmetric(vertical: 20),
-              itemBuilder: (context, index) {
-                var user = state.filteredUserList[index];
+              itemBuilder: (context, contactIndex) {
+                var user = state.filteredUserList[contactIndex];
                 return InkWell(
                   onTap: () {
                     context.read<HomeCubit>().isUpdateStatusChanged(true);
@@ -153,104 +148,141 @@ class _UserList extends StatelessWidget {
                     Navigator.push(context, _animatedRoute());
                   },
                   child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: ColorConstants.white,
-                    ),
+                    decoration: CommonDecorations.whiteColorBorder12(),
                     child: Row(
                       children: [
+                        /// Left Padding
                         const SizedBox(width: 20),
-                        CircleAvatar(
-                          radius: 17,
-                          backgroundColor: Colors.transparent,
-                          child: user.profileImageUrl != null && user.profileImageUrl!.isNotEmpty
-                              ? Image.network(
-                                  user.profileImageUrl!,
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.asset(
-                                  'assets/png/profile_picture.png',
-                                  fit: BoxFit.cover,
-                                ),
-                        ),
+                        _EachContactPhoto(user: user),
+
+                        /// Padding Between Contact Photo & Texts
                         const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 13),
-                            Text.rich(
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: CommonStyles.bodyLargeBlack(),
-                              TextSpan(
-                                text: user.firstName ?? '',
-                                children: [
-                                  const TextSpan(
-                                    text: ' ',
-                                  ),
-                                  TextSpan(
-                                    text: user.lastName ?? '',
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text(
-                              user.phoneNumber ?? '',
-                              style: CommonStyles.bodyLargeGrey(),
-                            ),
-                            const SizedBox(height: 13),
-                          ],
-                        ),
+                        _EachNameAndPhoneNumberTexts(user: user),
+
+                        /// Right Padding
                         const SizedBox(width: 20),
                       ],
                     ),
                   ),
                 );
               },
+
+              /// Padding between each contact
               separatorBuilder: (context, index) => const SizedBox(height: 20),
             );
           }
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/png/profile_picture.png',
-                width: 60,
-                height: 60,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                AppLocalizations.of(context)!.noContacts,
-                textAlign: TextAlign.center,
-                style: CommonStyles.titleLargeBlack(),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                AppLocalizations.of(context)!.addContactsText,
-                textAlign: TextAlign.center,
-                style: CommonStyles.bodyLargeBlack(),
-              ),
-              TextButton(
-                onPressed: () {
-                  context.read<HomeCubit>().isUpdateStatusChanged(false);
-
-                  /// This (false) is for if user use back button in the phone, and then go to another person.
-                  context.read<HomeCubit>().isUserEditableStatusChanged(false);
-                  Navigator.push(context, _animatedRoute());
-                },
-                child: Text(
-                  AppLocalizations.of(context)!.createContact,
-                  textAlign: TextAlign.center,
-                  style: CommonStyles.bodyLargeBlue(),
-                ),
-              ),
-            ],
-          );
+          return _ThereIsNoContactView();
         }
       },
+    );
+  }
+}
+
+class _EachContactPhoto extends StatelessWidget {
+  const _EachContactPhoto({required this.user});
+
+  final User user;
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      radius: 17,
+      backgroundColor: Colors.transparent,
+      child: user.profileImageUrl != null && user.profileImageUrl!.isNotEmpty
+          ? Image.network(
+              user.profileImageUrl!,
+              fit: BoxFit.cover,
+            )
+          : Image.asset(
+              'assets/png/profile_picture.png',
+              fit: BoxFit.cover,
+            ),
+    );
+  }
+}
+
+class _EachNameAndPhoneNumberTexts extends StatelessWidget {
+  const _EachNameAndPhoneNumberTexts({required this.user});
+
+  final User user;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        /// Top Padding
+        const SizedBox(height: 13),
+        Text.rich(
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: CommonStyles.bodyLargeBlack(),
+          TextSpan(
+            text: user.firstName ?? '',
+            children: [
+              const TextSpan(
+                text: ' ',
+              ),
+              TextSpan(
+                text: user.lastName ?? '',
+              ),
+            ],
+          ),
+        ),
+        Text(
+          user.phoneNumber ?? '',
+          style: CommonStyles.bodyLargeGrey(),
+        ),
+
+        /// Bottom Padding
+        const SizedBox(height: 13),
+      ],
+    );
+  }
+}
+
+class _ThereIsNoContactView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Image.asset(
+          'assets/png/profile_picture.png',
+          width: 60,
+          height: 60,
+          fit: BoxFit.contain,
+        ),
+        const SizedBox(height: 16),
+        Text(
+          AppLocalizations.of(context)!.noContacts,
+          textAlign: TextAlign.center,
+          style: CommonStyles.titleLargeBlack(),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          AppLocalizations.of(context)!.addContactsText,
+          textAlign: TextAlign.center,
+          style: CommonStyles.bodyLargeBlack(),
+        ),
+        TextButton(
+          onPressed: () {
+            context.read<HomeCubit>().isUpdateStatusChanged(false);
+            context.read<HomeCubit>().createStatusChanged(Status.idle);
+
+            /// This (false) is for if user use back button in the phone, and then go to another person.
+            context.read<HomeCubit>().isUserEditableStatusChanged(false);
+            Navigator.push(context, _animatedRoute());
+          },
+          child: Text(
+            AppLocalizations.of(context)!.createContact,
+            textAlign: TextAlign.center,
+            style: CommonStyles.bodyLargeBlue(),
+          ),
+        ),
+      ],
     );
   }
 }

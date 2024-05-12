@@ -56,7 +56,6 @@ class _UpsertUserFormState extends State<UpsertUserForm> {
       },
       child: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
-          var user = state.selectedUser;
           var isUpdate = state.isUpdate;
           var isEditable = state.isUserEditable;
           return Container(
@@ -167,27 +166,11 @@ class _UpsertUserFormState extends State<UpsertUserForm> {
                 ),
                 const SizedBox(height: 24),
                 _FirstName(),
-                if (!isUpdate || isEditable) const SizedBox(height: 20),
+                if ((isUpdate && isEditable) || (!isUpdate && !isEditable)) const SizedBox(height: 20),
                 _LastName(),
-                if (!isUpdate || isEditable) const SizedBox(height: 20),
+                if ((isUpdate && isEditable) || (!isUpdate && !isEditable)) const SizedBox(height: 20),
                 _PhoneNumber(),
-                if (isUpdate && !isEditable)
-                  Row(
-                    children: [
-                      const SizedBox(width: 8),
-                      TextButton(
-                        onPressed: () {
-                          if (user.id != null && user.id!.isNotEmpty) {
-                            context.read<HomeCubit>().deleteUserRequested(user.id!);
-                          }
-                        },
-                        child: Text(
-                          AppLocalizations.of(context)!.deleteAccount,
-                          style: CommonStyles.redDeleteAccountTextStyle(),
-                        ),
-                      ),
-                    ],
-                  ),
+                if ((isUpdate && !isEditable) || (!isUpdate && state.createStatus == Status.success && !isEditable)) _DeleteButton(),
                 const Spacer(),
               ],
             ),
@@ -211,18 +194,20 @@ class _FirstName extends StatelessWidget {
         var isUpdate = state.isUpdate;
         var isEditable = state.isUserEditable;
         return Container(
-          decoration: isUpdate && !isEditable ? null : CommonDecorations.pageColorBorder15(),
+          decoration: (isUpdate && !isEditable) || (!isUpdate && state.createStatus == Status.success && !isEditable)
+              ? null
+              : CommonDecorations.pageColorBorder15(),
           child: TextFormField(
             textAlign: TextAlign.left,
             cursorColor: ColorConstants.blue,
             keyboardType: TextInputType.text,
             style: CommonStyles.bodyLargeBlack(),
-            enabled: isUpdate && !isEditable ? false : true,
+            enabled: (isUpdate && !isEditable) || (!isUpdate && state.createStatus == Status.success && !isEditable) ? false : true,
             validator: (value) => state.firstName.errorMessage,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             controller: isUpdate ? TextEditingController(text: state.selectedUser.firstName) : null,
             onChanged: (firstName) => context.read<HomeCubit>().firstNameChanged(firstName.trim()),
-            decoration: isUpdate && !isEditable
+            decoration: (isUpdate && !isEditable) || (!isUpdate && state.createStatus == Status.success && !isEditable)
                 ? CommonDecorations.textFormFieldUnderlineDecoration(AppLocalizations.of(context)!.firstName)
                 : CommonDecorations.textFormFieldDecoration(AppLocalizations.of(context)!.firstName),
           ),
@@ -245,18 +230,20 @@ class _LastName extends StatelessWidget {
         var isUpdate = state.isUpdate;
         var isEditable = state.isUserEditable;
         return Container(
-          decoration: isUpdate && !isEditable ? null : CommonDecorations.pageColorBorder15(),
+          decoration: (isUpdate && !isEditable) || (!isUpdate && state.createStatus == Status.success && !isEditable)
+              ? null
+              : CommonDecorations.pageColorBorder15(),
           child: TextFormField(
             textAlign: TextAlign.left,
             cursorColor: ColorConstants.blue,
             keyboardType: TextInputType.text,
-            enabled: isUpdate && !isEditable ? false : true,
+            enabled: (isUpdate && !isEditable) || (!isUpdate && state.createStatus == Status.success && !isEditable) ? false : true,
             validator: (value) => state.lastName.errorMessage,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             controller: isUpdate ? TextEditingController(text: state.selectedUser.lastName) : null,
             onChanged: (lastName) => context.read<HomeCubit>().lastNameChanged(lastName.trim()),
             style: CommonStyles.bodyLargeBlack(),
-            decoration: isUpdate && !isEditable
+            decoration: (isUpdate && !isEditable) || (!isUpdate && state.createStatus == Status.success && !isEditable)
                 ? CommonDecorations.textFormFieldUnderlineDecoration(AppLocalizations.of(context)!.lastName)
                 : CommonDecorations.textFormFieldDecoration(AppLocalizations.of(context)!.lastName),
           ),
@@ -282,16 +269,18 @@ class _PhoneNumber extends StatelessWidget {
         var isUpdate = state.isUpdate;
         var isEditable = state.isUserEditable;
         return Container(
-          decoration: isUpdate && !isEditable ? null : CommonDecorations.pageColorBorder15(),
+          decoration: (isUpdate && !isEditable) || (!isUpdate && state.createStatus == Status.success && !isEditable)
+              ? null
+              : CommonDecorations.pageColorBorder15(),
           child: TextFormField(
             textAlign: TextAlign.left,
             cursorColor: ColorConstants.blue,
-            enabled: isUpdate && !isEditable ? false : true,
+            enabled: (isUpdate && !isEditable) || (!isUpdate && state.createStatus == Status.success && !isEditable) ? false : true,
             keyboardType: TextInputType.phone,
             style: CommonStyles.bodyLargeBlack(),
             controller: isUpdate ? TextEditingController(text: state.selectedUser.phoneNumber) : null,
             onChanged: (phoneNumber) => context.read<HomeCubit>().phoneNumberChanged(phoneNumber),
-            decoration: isUpdate && !isEditable
+            decoration: (isUpdate && !isEditable) || (!isUpdate && state.createStatus == Status.success && !isEditable)
                 ? CommonDecorations.textFormFieldUnderlineDecoration(AppLocalizations.of(context)!.phoneNumber)
                 : CommonDecorations.textFormFieldDecoration(AppLocalizations.of(context)!.phoneNumber),
           ),
@@ -393,6 +382,33 @@ class _CreateUserSuccessBottomSheet extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+}
+
+class _DeleteButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HomeCubit, HomeState>(
+      builder: (context, state) {
+        var user = state.selectedUser;
+        return Row(
+          children: [
+            const SizedBox(width: 8),
+            TextButton(
+              onPressed: () {
+                if (user.id != null && user.id!.isNotEmpty) {
+                  context.read<HomeCubit>().deleteUserRequested(user.id!);
+                }
+              },
+              child: Text(
+                AppLocalizations.of(context)!.deleteAccount,
+                style: CommonStyles.redDeleteAccountTextStyle(),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
