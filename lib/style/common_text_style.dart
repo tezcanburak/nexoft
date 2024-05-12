@@ -42,6 +42,14 @@ class CommonStyles {
     );
   }
 
+  static TextStyle bodyLargeGreen() {
+    return TextStyle(
+      fontSize: 16,
+      color: ColorConstants.green,
+      fontWeight: FontWeight.bold,
+    );
+  }
+
   static TextStyle bodySmallGrey() {
     return TextStyle(
       fontSize: 16,
@@ -81,5 +89,4 @@ class CommonStyles {
       fontWeight: FontWeight.bold,
     );
   }
-
 }

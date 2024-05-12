@@ -48,139 +48,152 @@ class _UpsertUserFormState extends State<UpsertUserForm> {
   Widget build(BuildContext context) {
     var size = ScreenUtil.getScreenSize();
 
-    return BlocBuilder<HomeCubit, HomeState>(
-      builder: (context, state) {
-        var isUpdate = state.isUpdate;
-        var isEditable = state.isEditable;
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: CommonDecorations.commonUpsertUserPageDecoration(),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _CancelEditDoneButtons(),
-              CircleAvatar(
-                radius: size.width * 0.225,
-                backgroundColor: Colors.transparent,
-                child: selectedImage.pickedImage.path.isNotEmpty
-                    ? Image.file(
-                        File(selectedImage.pickedImage.path),
-                        fit: BoxFit.cover,
-                      )
-                    : Image.asset(
-                        'assets/png/profile_picture.png',
-                        fit: BoxFit.cover,
-                      ),
-              ),
+    return BlocListener<HomeCubit, HomeState>(
+      listener: (context, state) {
+        if (state.deleteStatus == Status.success) {
+          Navigator.pop(context);
+        }
+      },
+      child: BlocBuilder<HomeCubit, HomeState>(
+        builder: (context, state) {
+          var user = state.selectedUser;
+          var isUpdate = state.isUpdate;
+          var isEditable = state.isUserEditable;
+          return Container(
+            padding: const EdgeInsets.all(16),
+            decoration: CommonDecorations.commonUpsertUserPageDecoration(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _CancelEditDoneButtons(),
+                const SizedBox(height: 25),
+                CircleAvatar(
+                  radius: size.width * 0.225,
+                  backgroundColor: Colors.transparent,
+                  child: selectedImage.pickedImage.path.isNotEmpty
+                      ? Image.file(
+                          File(selectedImage.pickedImage.path),
+                          fit: BoxFit.cover,
+                        )
+                      : Image.asset(
+                          'assets/png/profile_picture.png',
+                          fit: BoxFit.cover,
+                        ),
+                ),
 
-              /// This row is used to prevent the clickable area from stretching to the entire width.
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        backgroundColor: ColorConstants.pageColor,
-                        barrierColor: Colors.transparent,
-                        elevation: 0,
-                        context: context,
-                        builder: (modalBottomSheetContext) {
-                          return Container(
-                            padding: const EdgeInsets.all(30),
-                            decoration: CommonDecorations.commonUpsertUserPageDecoration(),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                InkWell(
-                                  onTap: takePhoto,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: CommonDecorations.pageColorBorder10(),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'camera',
-                                          style: CommonStyles.titleLargeBlack(),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 15),
-                                InkWell(
-                                  onTap: pickSingleImage,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: CommonDecorations.pageColorBorder10(),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'gallery',
-                                          style: CommonStyles.titleLargeBlack(),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 15),
-                                InkWell(
-                                  onTap: () => Navigator.pop(modalBottomSheetContext),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: CommonDecorations.pageColorBorder10(),
-                                    child: Center(
-                                      child: Text(
-                                        AppLocalizations.of(context)!.cancel,
-                                        style: CommonStyles.titleLargeBlue(),
+                /// This row is used to prevent the clickable area from stretching to the entire width.
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          backgroundColor: ColorConstants.pageColor,
+                          barrierColor: Colors.transparent,
+                          elevation: 0,
+                          context: context,
+                          builder: (modalBottomSheetContext) {
+                            return Container(
+                              padding: const EdgeInsets.all(30),
+                              decoration: CommonDecorations.commonUpsertUserPageDecoration(),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  InkWell(
+                                    onTap: takePhoto,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 10),
+                                      decoration: CommonDecorations.pageColorBorder10(),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            AppLocalizations.of(context)!.camera,
+                                            style: CommonStyles.titleLargeBlack(),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    child: Text(
-                      AppLocalizations.of(context)!.changePhoto,
-                      softWrap: true,
-                      style: CommonStyles.bodyLargeBlack(),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              _FirstName(),
-              if (!isUpdate || isEditable) const SizedBox(height: 20),
-              _LastName(),
-              if (!isUpdate || isEditable) const SizedBox(height: 20),
-              _PhoneNumber(),
-              if (isUpdate && !isEditable)
-                Row(
-                  children: [
-                    const SizedBox(width: 8),
-                    TextButton(
-                      onPressed: () {},
+                                  const SizedBox(height: 15),
+                                  InkWell(
+                                    onTap: pickSingleImage,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 10),
+                                      decoration: CommonDecorations.pageColorBorder10(),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            AppLocalizations.of(context)!.gallery,
+                                            style: CommonStyles.titleLargeBlack(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 15),
+                                  InkWell(
+                                    onTap: () => Navigator.pop(modalBottomSheetContext),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 10),
+                                      decoration: CommonDecorations.pageColorBorder10(),
+                                      child: Center(
+                                        child: Text(
+                                          AppLocalizations.of(context)!.cancel,
+                                          style: CommonStyles.titleLargeBlue(),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
                       child: Text(
-                        AppLocalizations.of(context)!.deleteAccount,
-                        style: CommonStyles.redDeleteAccountTextStyle(),
+                        AppLocalizations.of(context)!.changePhoto,
+                        softWrap: true,
+                        style: CommonStyles.bodyLargeBlack(),
                       ),
                     ),
                   ],
                 ),
-              const Spacer(),
-            ],
-          ),
-        );
-      },
+                const SizedBox(height: 24),
+                _FirstName(),
+                if (!isUpdate || isEditable) const SizedBox(height: 20),
+                _LastName(),
+                if (!isUpdate || isEditable) const SizedBox(height: 20),
+                _PhoneNumber(),
+                if (isUpdate && !isEditable)
+                  Row(
+                    children: [
+                      const SizedBox(width: 8),
+                      TextButton(
+                        onPressed: () {
+                          if (user.id != null && user.id!.isNotEmpty) {
+                            context.read<HomeCubit>().deleteUserRequested(user.id!);
+                          }
+                        },
+                        child: Text(
+                          AppLocalizations.of(context)!.deleteAccount,
+                          style: CommonStyles.redDeleteAccountTextStyle(),
+                        ),
+                      ),
+                    ],
+                  ),
+                const Spacer(),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -193,10 +206,10 @@ class _FirstName extends StatelessWidget {
           prev.firstName != curr.firstName ||
           prev.isUpdate != curr.isUpdate ||
           prev.selectedUser != curr.selectedUser ||
-          prev.isEditable != curr.isEditable,
+          prev.isUserEditable != curr.isUserEditable,
       builder: (context, state) {
         var isUpdate = state.isUpdate;
-        var isEditable = state.isEditable;
+        var isEditable = state.isUserEditable;
         return Container(
           decoration: isUpdate && !isEditable ? null : CommonDecorations.pageColorBorder15(),
           child: TextFormField(
@@ -210,8 +223,8 @@ class _FirstName extends StatelessWidget {
             controller: isUpdate ? TextEditingController(text: state.selectedUser.firstName) : null,
             onChanged: (firstName) => context.read<HomeCubit>().firstNameChanged(firstName.trim()),
             decoration: isUpdate && !isEditable
-                ? CommonDecorations.textFormFieldUnderlineDecoration('firstName')
-                : CommonDecorations.textFormFieldDecoration('firstName'),
+                ? CommonDecorations.textFormFieldUnderlineDecoration(AppLocalizations.of(context)!.firstName)
+                : CommonDecorations.textFormFieldDecoration(AppLocalizations.of(context)!.firstName),
           ),
         );
       },
@@ -227,10 +240,10 @@ class _LastName extends StatelessWidget {
           prev.lastName != curr.lastName ||
           prev.isUpdate != curr.isUpdate ||
           prev.selectedUser != curr.selectedUser ||
-          prev.isEditable != curr.isEditable,
+          prev.isUserEditable != curr.isUserEditable,
       builder: (context, state) {
         var isUpdate = state.isUpdate;
-        var isEditable = state.isEditable;
+        var isEditable = state.isUserEditable;
         return Container(
           decoration: isUpdate && !isEditable ? null : CommonDecorations.pageColorBorder15(),
           child: TextFormField(
@@ -244,8 +257,8 @@ class _LastName extends StatelessWidget {
             onChanged: (lastName) => context.read<HomeCubit>().lastNameChanged(lastName.trim()),
             style: CommonStyles.bodyLargeBlack(),
             decoration: isUpdate && !isEditable
-                ? CommonDecorations.textFormFieldUnderlineDecoration('lastName')
-                : CommonDecorations.textFormFieldDecoration('lastName'),
+                ? CommonDecorations.textFormFieldUnderlineDecoration(AppLocalizations.of(context)!.lastName)
+                : CommonDecorations.textFormFieldDecoration(AppLocalizations.of(context)!.lastName),
           ),
         );
       },
@@ -264,10 +277,10 @@ class _PhoneNumber extends StatelessWidget {
           prev.phoneNumber != curr.phoneNumber ||
           prev.isUpdate != curr.isUpdate ||
           prev.selectedUser != curr.selectedUser ||
-          prev.isEditable != curr.isEditable,
+          prev.isUserEditable != curr.isUserEditable,
       builder: (context, state) {
         var isUpdate = state.isUpdate;
-        var isEditable = state.isEditable;
+        var isEditable = state.isUserEditable;
         return Container(
           decoration: isUpdate && !isEditable ? null : CommonDecorations.pageColorBorder15(),
           child: TextFormField(
@@ -279,8 +292,8 @@ class _PhoneNumber extends StatelessWidget {
             controller: isUpdate ? TextEditingController(text: state.selectedUser.phoneNumber) : null,
             onChanged: (phoneNumber) => context.read<HomeCubit>().phoneNumberChanged(phoneNumber),
             decoration: isUpdate && !isEditable
-                ? CommonDecorations.textFormFieldUnderlineDecoration('phoneNumber')
-                : CommonDecorations.textFormFieldDecoration('phoneNumber'),
+                ? CommonDecorations.textFormFieldUnderlineDecoration(AppLocalizations.of(context)!.phoneNumber)
+                : CommonDecorations.textFormFieldDecoration(AppLocalizations.of(context)!.phoneNumber),
           ),
         );
       },
@@ -296,11 +309,12 @@ class _CancelEditDoneButtons extends StatelessWidget {
           prev.isValid != curr.isValid ||
           prev.isUpdate != curr.isUpdate ||
           prev.selectedUser != curr.selectedUser ||
-          prev.isEditable != curr.isEditable,
+          prev.isUserEditable != curr.isUserEditable ||
+          prev.createStatus != curr.createStatus,
       builder: (context, state) {
         var isUpdate = state.isUpdate;
         var isValid = state.isValid;
-        var isEditable = state.isEditable;
+        var isEditable = state.isUserEditable;
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -313,18 +327,16 @@ class _CancelEditDoneButtons extends StatelessWidget {
             ),
             if (isUpdate == false)
               Text(
-                'newContact',
+                AppLocalizations.of(context)!.newContact,
                 style: CommonStyles.bodyLargeBlack(),
               ),
             if (isUpdate)
               TextButton(
-                onPressed: () {
-                  if (isEditable) {
-                    context.read<HomeCubit>().isEditableStatusChanged(false);
-                  } else {
-                    context.read<HomeCubit>().isEditableStatusChanged(true);
-                  }
-                },
+                onPressed: isEditable
+
+                    /// TODO: If nothing changed convert onPressed null
+                    ? () => context.read<HomeCubit>().isUserEditableStatusChanged(false)
+                    : () => context.read<HomeCubit>().isUserEditableStatusChanged(true),
                 child: Text(
                   isEditable ? AppLocalizations.of(context)!.done : AppLocalizations.of(context)!.edit,
                   style: CommonStyles.bodyLargeBlue(),
@@ -332,15 +344,55 @@ class _CancelEditDoneButtons extends StatelessWidget {
               )
             else
               TextButton(
-                onPressed: isValid ? () => context.read<HomeCubit>().createUserRequested() : null,
+                onPressed: state.createStatus == Status.success
+                    ? () => context.read<HomeCubit>().isUpdateStatusChanged(true)
+                    : isValid
+                        ? () {
+                            context.read<HomeCubit>().createUserRequested();
+                            if (state.createStatus == Status.success) {
+                              showModalBottomSheet(
+                                elevation: 0,
+                                context: context,
+                                barrierColor: Colors.transparent,
+                                backgroundColor: ColorConstants.pageColor,
+                                builder: (modalBottomSheetContext) {
+                                  return _CreateUserSuccessBottomSheet();
+                                },
+                              );
+                            }
+                          }
+                        : null,
                 child: Text(
-                  AppLocalizations.of(context)!.done,
+                  state.createStatus == Status.success ? AppLocalizations.of(context)!.edit : AppLocalizations.of(context)!.done,
                   style: isValid ? CommonStyles.bodyLargeBlue() : CommonStyles.bodyLargeGrey(),
                 ),
               ),
           ],
         );
       },
+    );
+  }
+}
+
+class _CreateUserSuccessBottomSheet extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(30),
+      decoration: CommonDecorations.commonUpsertUserPageDecoration(),
+      child: Row(
+        children: [
+          SvgPicture.asset(
+            'assets/svg/green_success_icon.svg',
+            height: 24,
+            width: 24,
+          ),
+          Text(
+            AppLocalizations.of(context)!.userAdded,
+            style: CommonStyles.bodyLargeGreen(),
+          )
+        ],
+      ),
     );
   }
 }

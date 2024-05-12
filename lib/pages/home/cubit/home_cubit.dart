@@ -22,18 +22,8 @@ class HomeCubit extends Cubit<HomeState> {
     ApiResult<List<User>?> apiResult = await homeRepository.getAllUsers();
     List<User>? apiUserList = apiResult.data;
     if (apiResult.success && apiUserList != null) {
-      apiResult.data?.sort((a, b) {
-        if (a.firstName == null && b.firstName == null) {
-          return 0; // If both names are null, maintain current order
-        } else if (a.firstName == null) {
-          return 1; // Move items with null names to the end
-        } else if (b.firstName == null) {
-          return -1; // Keep items with non-null names before null names
-        } else {
-          return a.firstName!.toUpperCase().compareTo(b.firstName!.toUpperCase()); // Compare non-null names
-        }
-      });
-      List<User> userList = List.from(state.userList);
+      sort(apiUserList);
+      List<User> userList = List.empty(growable: true);
       userList.addAll(apiUserList);
       emit(
         state.copyWith(
@@ -85,7 +75,7 @@ class HomeCubit extends Cubit<HomeState> {
   Future<void> createUserRequested() async {
     emit(
       state.copyWith(
-        fetchStatus: Status.inProgress,
+        createStatus: Status.inProgress,
       ),
     );
     User user = User(
@@ -95,11 +85,16 @@ class HomeCubit extends Cubit<HomeState> {
       profileImageUrl: null,
     );
 
-    bool isSuccess = await homeRepository.createUser(user);
+    User? createdUser = await homeRepository.createUser(user);
 
-    if (isSuccess) {
+    if (createdUser != null) {
+      List<User> userList = List.from(state.userList);
+      userList.add(createdUser);
+      sort(userList);
       emit(
         state.copyWith(
+          userList: userList,
+          selectedUser: createdUser,
           createStatus: Status.success,
         ),
       );
@@ -115,13 +110,19 @@ class HomeCubit extends Cubit<HomeState> {
   Future<void> deleteUserRequested(String userId) async {
     emit(
       state.copyWith(
-        fetchStatus: Status.inProgress,
+        deleteStatus: Status.inProgress,
       ),
     );
 
     bool isSuccess = await homeRepository.deleteUser(userId);
 
     if (isSuccess) {
+      /*    List<User> userList = List.from(state.userList);
+        var deletedUser = userList.where((element) => element.id!.contains(userId));
+        void newUserList = userList.removeWhere((e) => e.id == userId);*/
+
+      /// TODO: Burada hata var, uyg crash alıyor!!!
+      getAllUserListRequested();
       emit(
         state.copyWith(
           deleteStatus: Status.success,
@@ -144,6 +145,14 @@ class HomeCubit extends Cubit<HomeState> {
     );
   }
 
+  void createStatusChanged(Status createStatus) {
+    emit(
+      state.copyWith(
+        createStatus: createStatus,
+      ),
+    );
+  }
+
   void isUpdateStatusChanged(bool isUpdate) {
     emit(
       state.copyWith(
@@ -152,10 +161,10 @@ class HomeCubit extends Cubit<HomeState> {
     );
   }
 
-  void isEditableStatusChanged(bool isEditable) {
+  void isUserEditableStatusChanged(bool isUserEditable) {
     emit(
       state.copyWith(
-        isEditable: isEditable,
+        isUserEditable: isUserEditable,
       ),
     );
   }

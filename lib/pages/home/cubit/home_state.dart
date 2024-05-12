@@ -2,9 +2,16 @@ part of 'home_cubit.dart';
 
 class HomeState extends Equatable {
   final User selectedUser;
+
+  /// isValid == Each textFormField is filled.
   final bool isValid;
+
+  /// isUpdate == update // !isUpdate == create
   final bool isUpdate;
-  final bool isEditable;
+
+  /// isUserEditable (when go to user page) == userCanBeEditable
+  final bool isUserEditable;
+
   final Name firstName;
   final Name lastName;
   final PhoneNumber phoneNumber;
@@ -12,52 +19,54 @@ class HomeState extends Equatable {
   final Status createStatus;
   final Status deleteStatus;
   final List<User> userList;
+
+  /// filteredUserList for search
   final List<User> filteredUserList;
   final List<String> errorMessageList;
 
   const HomeState({
-    this.selectedUser = const User.empty(),
     this.userList = const [],
     this.filteredUserList = const [],
     this.errorMessageList = const [],
     this.isValid = false,
     this.isUpdate = false,
-    this.isEditable = false,
-    this.firstName = Name.empty,
+    this.isUserEditable = false,
     this.lastName = Name.empty,
+    this.firstName = Name.empty,
     this.phoneNumber = PhoneNumber.empty,
     this.fetchStatus = Status.idle,
     this.createStatus = Status.idle,
     this.deleteStatus = Status.idle,
+    this.selectedUser = const User.empty(),
   });
 
   HomeState copyWith({
-    User? selectedUser,
-    List<User>? userList,
-    List<User>? filteredUserList,
-    List<String>? errorMessageList,
     bool? isValid,
     bool? isUpdate,
-    bool? isEditable,
+    bool? isUserEditable,
     Name? firstName,
     Name? lastName,
+    User? selectedUser,
     PhoneNumber? phoneNumber,
     Status? fetchStatus,
     Status? createStatus,
     Status? deleteStatus,
+    List<User>? userList,
+    List<User>? filteredUserList,
+    List<String>? errorMessageList,
   }) {
     return HomeState(
-      selectedUser: selectedUser ?? this.selectedUser,
-      userList: userList ?? this.userList,
-      fetchStatus: fetchStatus ?? this.fetchStatus,
-      createStatus: createStatus ?? this.createStatus,
-      deleteStatus: deleteStatus ?? this.deleteStatus,
       isValid: isValid ?? this.isValid,
       isUpdate: isUpdate ?? this.isUpdate,
-      isEditable: isEditable ?? this.isEditable,
-      firstName: firstName ?? this.firstName,
+      userList: userList ?? this.userList,
       lastName: lastName ?? this.lastName,
+      firstName: firstName ?? this.firstName,
+      fetchStatus: fetchStatus ?? this.fetchStatus,
       phoneNumber: phoneNumber ?? this.phoneNumber,
+      createStatus: createStatus ?? this.createStatus,
+      deleteStatus: deleteStatus ?? this.deleteStatus,
+      selectedUser: selectedUser ?? this.selectedUser,
+      isUserEditable: isUserEditable ?? this.isUserEditable,
       errorMessageList: errorMessageList ?? this.errorMessageList,
       filteredUserList: filteredUserList ?? this.filteredUserList,
     );
@@ -65,17 +74,17 @@ class HomeState extends Equatable {
 
   @override
   List<Object?> get props => [
-        selectedUser,
+        isValid,
         userList,
+        isUpdate,
+        lastName,
+        firstName,
         fetchStatus,
+        phoneNumber,
+        selectedUser,
         createStatus,
         deleteStatus,
-        isValid,
-        isUpdate,
-        isEditable,
-        firstName,
-        lastName,
-        phoneNumber,
+        isUserEditable,
         errorMessageList,
         filteredUserList,
       ];

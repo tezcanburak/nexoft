@@ -62,9 +62,10 @@ class _ContactsAndAddButton extends StatelessWidget {
         InkWell(
           onTap: () {
             context.read<HomeCubit>().isUpdateStatusChanged(false);
+            context.read<HomeCubit>().createStatusChanged(Status.idle);
 
             /// This (false) is for if user use back button in the phone, and then go to another person.
-            context.read<HomeCubit>().isEditableStatusChanged(false);
+            context.read<HomeCubit>().isUserEditableStatusChanged(false);
             Navigator.push(context, _animatedRoute());
           },
           child: SvgPicture.asset('assets/svg/blue_plus_icon.svg'),
@@ -88,17 +89,15 @@ class _SearchBarWidget extends StatelessWidget {
       child: TextField(
         onChanged: (value) => cubit.filterUserListRequested(value.trim()),
         cursorColor: ColorConstants.black,
-        style: TextStyle(
-          color: ColorConstants.black,
-        ),
+        style: CommonStyles.bodyLargeBlack(),
         controller: _searchController,
         decoration: InputDecoration(
           isDense: true,
+          contentPadding: EdgeInsets.zero,
+          border: const OutlineInputBorder(borderSide: BorderSide.none),
           enabledBorder: const OutlineInputBorder(borderSide: BorderSide.none),
-          hintStyle: TextStyle(
-            color: ColorConstants.black.withOpacity(0.4),
-          ),
           hintText: AppLocalizations.of(context)!.search,
+          hintStyle: CommonStyles.bodyLargeGrey(),
           prefixIconConstraints: const BoxConstraints(maxHeight: 21),
           prefixIcon: Padding(
             padding: const EdgeInsets.only(left: 12, right: 15),
@@ -117,10 +116,6 @@ class _SearchBarWidget extends StatelessWidget {
               color: ColorConstants.black.withOpacity(0.4),
             ),
           ),
-          contentPadding: EdgeInsets.zero,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
         ),
       ),
     );
@@ -134,8 +129,11 @@ class _UserList extends StatelessWidget {
       buildWhen: (prev, curr) => prev.filteredUserList != curr.filteredUserList || prev.fetchStatus != curr.fetchStatus,
       builder: (context, state) {
         if (state.fetchStatus == Status.inProgress) {
-          return const Center(
-            child: CircularProgressIndicator(),
+          return Center(
+            child: CircularProgressIndicator(
+              color: ColorConstants.blue,
+              backgroundColor: ColorConstants.grey,
+            ),
           );
         } else {
           if (state.filteredUserList.isNotEmpty) {
@@ -149,8 +147,8 @@ class _UserList extends StatelessWidget {
                   onTap: () {
                     context.read<HomeCubit>().isUpdateStatusChanged(true);
 
-                    /// This (false) is for if user use back button in the phone, and then go to another person.
-                    context.read<HomeCubit>().isEditableStatusChanged(false);
+                    /// This (false) is for if user use back button in the phone, and then pick another person.
+                    context.read<HomeCubit>().isUserEditableStatusChanged(false);
                     context.read<HomeCubit>().selectedUserChanged(user);
                     Navigator.push(context, _animatedRoute());
                   },
@@ -162,22 +160,39 @@ class _UserList extends StatelessWidget {
                     child: Row(
                       children: [
                         const SizedBox(width: 20),
-                        Container(
-                          height: 34,
-                          width: 34,
-                          decoration: const BoxDecoration(
-                            color: Colors.black,
-                            shape: BoxShape.circle,
-                          ),
+                        CircleAvatar(
+                          radius: 17,
+                          backgroundColor: Colors.transparent,
+                          child: user.profileImageUrl != null && user.profileImageUrl!.isNotEmpty
+                              ? Image.network(
+                                  user.profileImageUrl!,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.asset(
+                                  'assets/png/profile_picture.png',
+                                  fit: BoxFit.cover,
+                                ),
                         ),
                         const SizedBox(width: 10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 13),
-                            Text(
-                              user.firstName ?? '',
+                            Text.rich(
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: CommonStyles.bodyLargeBlack(),
+                              TextSpan(
+                                text: user.firstName ?? '',
+                                children: [
+                                  const TextSpan(
+                                    text: ' ',
+                                  ),
+                                  TextSpan(
+                                    text: user.lastName ?? '',
+                                  ),
+                                ],
+                              ),
                             ),
                             Text(
                               user.phoneNumber ?? '',
@@ -223,7 +238,7 @@ class _UserList extends StatelessWidget {
                   context.read<HomeCubit>().isUpdateStatusChanged(false);
 
                   /// This (false) is for if user use back button in the phone, and then go to another person.
-                  context.read<HomeCubit>().isEditableStatusChanged(false);
+                  context.read<HomeCubit>().isUserEditableStatusChanged(false);
                   Navigator.push(context, _animatedRoute());
                 },
                 child: Text(

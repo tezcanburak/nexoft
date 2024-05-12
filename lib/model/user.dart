@@ -6,7 +6,6 @@ class User {
   final String? profileImageUrl;
 
   final DateTime? createdAt;
-
   const User({
     this.id,
     this.firstName,
@@ -53,7 +52,8 @@ class User {
     );
   }
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() =>
+      {
         'id': id,
         'lastName': lastName,
         'firstName': firstName,

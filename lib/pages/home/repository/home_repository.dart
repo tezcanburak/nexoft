@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:nexoft/model/user.dart';
 import 'package:nexoft/dio/base/dio.dart';
@@ -42,7 +41,7 @@ class HomeRepository {
     }
   }
 
-  Future<bool> createUser(User user) async {
+  Future<User?> createUser(User user) async {
     try {
       final Response response = await dioC!.post(
         ApiConstants.userUrl,
@@ -52,14 +51,18 @@ class HomeRepository {
       // Check if the response is null or the status code indicates success (2xx range)
       if (response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300) {
         // User creation successful
-        return true;
+        final userData = response.data;
+
+        // Create ApiResult with the mapped user list
+
+        return userData;
       } else {
         // User creation failed
-        return false;
+        return null;
       }
     } catch (e) {
       // Handle any errors that occurred during the API call
-      return false;
+      return null;
     }
   }
 
