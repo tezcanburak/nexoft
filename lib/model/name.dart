@@ -2,7 +2,7 @@ import 'package:nexoft/exports.dart';
 
 enum NameValidationError {
   /// Generic invalid error.
-  lessThan3,
+  lessThan2,
   moreThan50,
   containsSymbol,
 }
@@ -33,13 +33,11 @@ class Name extends Equatable {
 
   Name? validator() {
     if (value != '') {
-      /// TODO: Redundant initilization to 'null'.
-      ///
-      if (value.length < 3) {
+      if (value.length < 2) {
         return Name(
           value: value,
           showError: true,
-          errorMessage: _getErrorMessage(NameValidationError.lessThan3),
+          errorMessage: _getErrorMessage(NameValidationError.lessThan2),
         );
       }
 
@@ -62,22 +60,21 @@ class Name extends Equatable {
     return Name(value: value, showError: false);
   }
 
-  /// TODO: This RegExp doesn't contain Turkish characters!!!
   bool containsNonLetter(String input) {
-    RegExp regExp = RegExp(r'[^a-zA-Z]');
+    RegExp regExp = RegExp(r'[^a-zA-ZğüşöçİĞÜŞÖÇ]');
     return regExp.hasMatch(input);
   }
 
   String? _getErrorMessage(NameValidationError error) {
     switch (error) {
-      case NameValidationError.lessThan3:
-        return "lessThan3";
+      case NameValidationError.lessThan2:
+        return "You cannot enter less than 2 chars!";
 
       case NameValidationError.moreThan50:
-        return "moreThan50";
+        return "You cannot enter more than 50 chars!";
 
       case NameValidationError.containsSymbol:
-        return "containsSymbol";
+        return "Contains Symbol!";
       default:
         return null;
     }

@@ -2,6 +2,7 @@ part of 'home_cubit.dart';
 
 class HomeState extends Equatable {
   final User selectedUser;
+  final User editedSelectedUser;
 
   final XFile? image;
 
@@ -19,6 +20,7 @@ class HomeState extends Equatable {
   final PhoneNumber phoneNumber;
   final Status fetchStatus;
   final Status createStatus;
+  final Status updateStatus;
   final Status deleteStatus;
   final List<User> userList;
 
@@ -38,8 +40,10 @@ class HomeState extends Equatable {
     this.phoneNumber = PhoneNumber.empty,
     this.fetchStatus = Status.idle,
     this.createStatus = Status.idle,
+    this.updateStatus = Status.idle,
     this.deleteStatus = Status.idle,
     this.selectedUser = const User.empty(),
+    this.editedSelectedUser = const User.empty(),
     this.image,
   });
 
@@ -51,9 +55,11 @@ class HomeState extends Equatable {
     Name? firstName,
     Name? lastName,
     User? selectedUser,
+    User? editedSelectedUser,
     PhoneNumber? phoneNumber,
     Status? fetchStatus,
     Status? createStatus,
+    Status? updateStatus,
     Status? deleteStatus,
     List<User>? userList,
     List<User>? filteredUserList,
@@ -69,11 +75,13 @@ class HomeState extends Equatable {
       fetchStatus: fetchStatus ?? this.fetchStatus,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       createStatus: createStatus ?? this.createStatus,
+      updateStatus: updateStatus ?? this.updateStatus,
       deleteStatus: deleteStatus ?? this.deleteStatus,
       selectedUser: selectedUser ?? this.selectedUser,
       isUserEditable: isUserEditable ?? this.isUserEditable,
       errorMessageList: errorMessageList ?? this.errorMessageList,
       filteredUserList: filteredUserList ?? this.filteredUserList,
+      editedSelectedUser: editedSelectedUser ?? this.editedSelectedUser,
     );
   }
 
@@ -89,9 +97,11 @@ class HomeState extends Equatable {
         phoneNumber,
         selectedUser,
         createStatus,
+        updateStatus,
         deleteStatus,
         isUserEditable,
         errorMessageList,
         filteredUserList,
+        editedSelectedUser,
       ];
 }

@@ -18,7 +18,7 @@ class CommonDecorations {
     );
   }
 
-  static BoxDecoration pageColorBorder10() {
+  static BoxDecoration pageColorBorder10WithShadow() {
     return BoxDecoration(
       color: ColorConstants.pageColor,
       borderRadius: BorderRadius.circular(10),
@@ -52,6 +52,15 @@ class CommonDecorations {
       contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       hintText: hintText,
       hintStyle: CommonStyles.bodyLargeGrey(),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: BorderSide(color: ColorConstants.red, width: 1),
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: BorderSide(color: ColorConstants.black, width: 1),
+      ),
+      errorStyle: CommonStyles.bodySmallRed(),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
         borderSide: BorderSide(color: ColorConstants.black, width: 1),

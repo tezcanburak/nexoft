@@ -1,6 +1,7 @@
 import 'package:nexoft/exports.dart';
 import 'package:nexoft/model/user.dart';
 import 'package:nexoft/pages/home/cubit/home_cubit.dart';
+import 'package:nexoft/generic_components/approve_bottom_sheet.dart';
 import 'package:nexoft/pages/upsert_user/view/upsert_user_page.dart';
 
 class HomeForm extends StatelessWidget {
@@ -28,6 +29,18 @@ class HomeForm extends StatelessWidget {
                 content: Text('There is an error!'),
               ),
             );
+        }
+        if (state.deleteStatus == Status.showPopUp) {
+          context.read<HomeCubit>().deleteStatusChanged(Status.idle);
+          showModalBottomSheet(
+            elevation: 0,
+            context: context,
+            barrierColor: Colors.transparent,
+            backgroundColor: Colors.transparent,
+            builder: (modalBottomSheetContext) {
+              return ApproveBottomSheet(text: AppLocalizations.of(context)!.accountDeleted);
+            },
+          );
         }
       },
 
@@ -66,6 +79,8 @@ class _ContactsAndAddButton extends StatelessWidget {
           onTap: () {
             context.read<HomeCubit>().isUpdateStatusChanged(false);
             context.read<HomeCubit>().createStatusChanged(Status.idle);
+            context.read<HomeCubit>().setImage(null);
+            context.read<HomeCubit>().selectedUserChanged(const User.empty());
 
             /// This (false) is for if user use back button in the phone, and then go to another person.
             context.read<HomeCubit>().isUserEditableStatusChanged(false);
@@ -92,6 +107,7 @@ class _SearchBarWidgetState extends State<_SearchBarWidget> {
   Widget build(BuildContext context) {
     var cubit = context.read<HomeCubit>();
     return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: CommonDecorations.whiteColorBorder12(),
       child: TextField(
         onChanged: (value) {
@@ -120,16 +136,6 @@ class _SearchBarWidgetState extends State<_SearchBarWidget> {
             child: SvgPicture.asset(
               'assets/svg/search_icon.svg',
               color: _searchController.text.trim().isNotEmpty ? ColorConstants.black : null,
-            ),
-          ),
-          suffixIcon: IconButton(
-            onPressed: () {
-              _searchController.clear();
-              cubit.filterUserListRequested(_searchController.text.trim());
-            },
-            icon: Icon(
-              Icons.clear,
-              color: ColorConstants.black.withOpacity(0.4),
             ),
           ),
         ),
@@ -172,6 +178,7 @@ class _UserList extends StatelessWidget {
                       return InkWell(
                         onTap: () {
                           context.read<HomeCubit>().isUpdateStatusChanged(true);
+                          context.read<HomeCubit>().setImage(null);
 
                           /// This (false) is for if user use back button in the phone, and then pick another person.
                           context.read<HomeCubit>().isUserEditableStatusChanged(false);
@@ -309,6 +316,8 @@ class _ThereIsNoContactView extends StatelessWidget {
           onPressed: () {
             context.read<HomeCubit>().isUpdateStatusChanged(false);
             context.read<HomeCubit>().createStatusChanged(Status.idle);
+            context.read<HomeCubit>().setImage(null);
+            context.read<HomeCubit>().selectedUserChanged(const User.empty());
 
             /// This (false) is for if user use back button in the phone, and then go to another person.
             context.read<HomeCubit>().isUserEditableStatusChanged(false);

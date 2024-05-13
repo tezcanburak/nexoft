@@ -4,4 +4,5 @@ enum Status {
   success,
   inProgress,
   missingInfo,
+  showPopUp,
 }

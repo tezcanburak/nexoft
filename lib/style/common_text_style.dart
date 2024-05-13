@@ -82,9 +82,25 @@ class CommonStyles {
     );
   }
 
-  static TextStyle redDeleteAccountTextStyle() {
+  static TextStyle bodyLargeRed() {
     return TextStyle(
       fontSize: 16,
+      color: ColorConstants.red,
+      fontWeight: FontWeight.bold,
+    );
+  }
+
+  static TextStyle bodySmallRed() {
+    return TextStyle(
+      fontSize: 16,
+      color: ColorConstants.red,
+      fontWeight: FontWeight.w500,
+    );
+  }
+
+  static TextStyle titleLargeRed() {
+    return TextStyle(
+      fontSize: 24,
       color: ColorConstants.red,
       fontWeight: FontWeight.bold,
     );

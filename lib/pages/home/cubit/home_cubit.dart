@@ -1,7 +1,7 @@
-import 'package:image_picker/image_picker.dart';
 import 'package:nexoft/exports.dart';
 import 'package:nexoft/model/name.dart';
 import 'package:nexoft/model/user.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:nexoft/model/phone_number.dart';
 import 'package:nexoft/dio/network_response/api_result.dart';
 import 'package:nexoft/pages/home/repository/home_repository.dart';
@@ -56,7 +56,7 @@ class HomeCubit extends Cubit<HomeState> {
     );
   }
 
-  void setImage(XFile image) {
+  void setImage(XFile? image) {
     emit(state.copyWith(image: image));
   }
 
@@ -83,59 +83,162 @@ class HomeCubit extends Cubit<HomeState> {
         createStatus: Status.inProgress,
       ),
     );
+    if (state.image != null) {
+      String? url = await homeRepository.uploadPhoto(state.image!);
+      if (url != null && url.isNotEmpty) {
+        User user = User(
+          firstName: state.firstName.value,
+          lastName: state.lastName.value,
+          phoneNumber: state.phoneNumber.value,
+          profileImageUrl: url,
+        );
+        ApiResult<User>? createdUser = await homeRepository.createUser(user);
 
-    User user = User(
-      firstName: state.firstName.value,
-      lastName: state.lastName.value,
-      phoneNumber: state.phoneNumber.value,
+        if (createdUser != null && createdUser.success == true) {
+          List<User> userList = List.from(state.userList);
+          userList.add(createdUser.data!);
+          sort(userList);
+          emit(
+            state.copyWith(
+              userList: userList,
+              selectedUser: createdUser.data!,
+              createStatus: Status.success,
+              image: null,
+            ),
+          );
+        } else {
+          emit(
+            state.copyWith(
+              createStatus: Status.failure,
+            ),
+          );
+        }
+      }
+    } else {
+      User user = User(
+        firstName: state.firstName.value,
+        lastName: state.lastName.value,
+        phoneNumber: state.phoneNumber.value,
+        profileImageUrl: null,
+      );
+      ApiResult<User>? createdUser = await homeRepository.createUser(user);
+
+      if (createdUser != null && createdUser.success == true) {
+        List<User> userList = List.from(state.userList);
+        userList.add(createdUser.data!);
+        sort(userList);
+        emit(
+          state.copyWith(
+            userList: userList,
+            selectedUser: createdUser.data!,
+            createStatus: Status.success,
+            image: null,
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            createStatus: Status.failure,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Update user info except PHOTO!!!
+  /// Update user photo is automatically done via choosing the picture!!! (addOrUpdateUserPhoto())
+  Future<void> updateUserRequested() async {
+    emit(
+      state.copyWith(
+        updateStatus: Status.inProgress,
+      ),
+    );
+    User selectedUser = state.selectedUser;
+    User editedUser = state.editedSelectedUser;
+    User updatedUser = User(
+      id: null,
+      createdAt: null,
+      firstName: selectedUser.firstName == editedUser.firstName ? null : editedUser.firstName,
+      lastName: selectedUser.lastName == editedUser.lastName ? null : editedUser.lastName,
+      phoneNumber: selectedUser.phoneNumber == editedUser.phoneNumber ? null : editedUser.phoneNumber,
       profileImageUrl: null,
     );
-    /// TODO: This will be handled!!!
-    bool url = await homeRepository.uploadPhotoAndCreateUser(state.image!, user);
-
-    ApiResult<User>? createdUser = await homeRepository.createUser(user);
-
-    if (createdUser != null && createdUser.success == true) {
-      List<User> userList = List.from(state.userList);
-      userList.add(createdUser.data!);
-      sort(userList);
-      emit(
-        state.copyWith(
-          userList: userList,
-          selectedUser: createdUser.data!,
-          createStatus: Status.success,
-        ),
-      );
+    if (selectedUser.id != null) {
+      bool isUserUpdated = await homeRepository.updateUser(selectedUser.id!, updatedUser);
+      if (isUserUpdated) {
+        emit(
+          state.copyWith(
+            selectedUser: editedUser,
+            editedSelectedUser: editedUser,
+            updateStatus: Status.success,
+            image: null,
+          ),
+        );
+      }
     } else {
       emit(
         state.copyWith(
-          createStatus: Status.failure,
+          updateStatus: Status.failure,
         ),
       );
     }
   }
 
-  Future<void> deleteUserRequested(String userId) async {
+  /// This is just for update!!!
+  /// DO NOT USE WHEN CREATING NEW USER!!!
+  /// After creating user, in edit page(this means it's update) You can use!!!
+  Future<void> addOrUpdateUserPhoto() async {
+    emit(
+      state.copyWith(updateStatus: Status.inProgress),
+    );
+    User selectedUser = state.selectedUser;
+    if (selectedUser.id != null) {
+      String? url = await homeRepository.uploadPhoto(state.image!);
+      if (url != null && url.isNotEmpty) {
+        User updatedUser = User(profileImageUrl: url);
+        bool isUserUpdated = await homeRepository.updateUser(selectedUser.id!, updatedUser);
+        if (isUserUpdated) {
+          User editedUser = state.selectedUser.copyWith(profileImageUrl: url);
+          emit(
+            state.copyWith(
+              selectedUser: editedUser,
+              editedSelectedUser: editedUser,
+              createStatus: Status.success,
+              image: null,
+            ),
+          );
+        }
+      } else {
+        emit(
+          state.copyWith(createStatus: Status.failure, image: null),
+        );
+      }
+    } else {
+      emit(
+        state.copyWith(createStatus: Status.failure, image: null),
+      );
+    }
+  }
+
+  Future<void> deleteUserRequested(User user) async {
     emit(
       state.copyWith(
         deleteStatus: Status.inProgress,
       ),
     );
-
-    bool isSuccess = await homeRepository.deleteUser(userId);
-
-    if (isSuccess) {
-      /*    List<User> userList = List.from(state.userList);
-        var deletedUser = userList.where((element) => element.id!.contains(userId));
-        void newUserList = userList.removeWhere((e) => e.id == userId);*/
-
-      /// TODO: Burada hata var, uyg crash alıyor!!!
-      getUsersList();
-      emit(
-        state.copyWith(
-          deleteStatus: Status.success,
-        ),
-      );
+    if (user.id != null && user.id!.isNotEmpty) {
+      bool isSuccess = await homeRepository.deleteUser(user.id!);
+      if (isSuccess) {
+        List<User> userList = List.from(state.userList);
+        userList.remove(user);
+        emit(
+          state.copyWith(
+            userList: userList,
+            filteredUserList: userList,
+            deleteStatus: Status.success,
+          ),
+        );
+      }
     } else {
       emit(
         state.copyWith(
@@ -148,7 +251,9 @@ class HomeCubit extends Cubit<HomeState> {
   void selectedUserChanged(User selectedUser) {
     emit(
       state.copyWith(
+        image: null,
         selectedUser: selectedUser,
+        editedSelectedUser: selectedUser,
       ),
     );
   }
@@ -157,6 +262,22 @@ class HomeCubit extends Cubit<HomeState> {
     emit(
       state.copyWith(
         createStatus: createStatus,
+      ),
+    );
+  }
+
+  void updateStatusChanged(Status updateStatus) {
+    emit(
+      state.copyWith(
+        updateStatus: updateStatus,
+      ),
+    );
+  }
+
+  void deleteStatusChanged(Status deleteStatus) {
+    emit(
+      state.copyWith(
+        deleteStatus: deleteStatus,
       ),
     );
   }
@@ -179,8 +300,10 @@ class HomeCubit extends Cubit<HomeState> {
 
   void firstNameChanged(String value) {
     var firstName = Name(value: value).validator();
+    User editedSelectedUser = state.editedSelectedUser.copyWith(firstName: value);
     emit(
       state.copyWith(
+        editedSelectedUser: editedSelectedUser,
         firstName: firstName,
         isValid: isValid(
           firstName,
@@ -193,8 +316,10 @@ class HomeCubit extends Cubit<HomeState> {
 
   void lastNameChanged(String value) {
     var lastName = Name(value: value).validator();
+    User editedSelectedUser = state.editedSelectedUser.copyWith(lastName: value);
     emit(
       state.copyWith(
+        editedSelectedUser: editedSelectedUser,
         lastName: lastName,
         isValid: isValid(
           state.firstName,
@@ -207,8 +332,10 @@ class HomeCubit extends Cubit<HomeState> {
 
   void phoneNumberChanged(String value) {
     var phoneNumber = PhoneNumber(value: value).validator();
+    User editedSelectedUser = state.editedSelectedUser.copyWith(phoneNumber: value);
     emit(
       state.copyWith(
+        editedSelectedUser: editedSelectedUser,
         phoneNumber: phoneNumber,
         isValid: isValid(
           state.firstName,

@@ -163,22 +163,4 @@ class HomeRepository {
       return false;
     }
   }
-
-// Method to upload photo and create user
-  Future<bool> uploadPhotoAndCreateUser(XFile photo, User user) async {
-    try {
-      // Upload the photo
-      String? imageUrl = await uploadPhoto(photo);
-      if (imageUrl != null) {
-        // If photo upload was successful, create the user with the obtained image URL
-        return await createUserWithPhoto(user, imageUrl);
-      } else {
-        // Photo upload failed
-        return false;
-      }
-    } catch (e) {
-      // Handle any errors that occurred during the process
-      return false;
-    }
-  }
 }
