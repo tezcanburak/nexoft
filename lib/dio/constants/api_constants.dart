@@ -1,7 +1,7 @@
 class ApiConstants {
   ApiConstants._();
 
-  String apiKey = "e2bbbb1c-024d-4f26-9abe-e7874cbc8937";
+  static const String apiKey = "e2bbbb1c-024d-4f26-9abe-e7874cbc8937";
   // base url
   static const String baseUrl = "http://146.59.52.68:11235/";
 

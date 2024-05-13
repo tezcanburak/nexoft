@@ -1,4 +1,3 @@
-export 'main.dart';
 export 'constants/color.dart';
 export 'package:bloc/bloc.dart';
 export 'constants/screen_util.dart';

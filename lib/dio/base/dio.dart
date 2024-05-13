@@ -7,8 +7,8 @@ class DioClient {
   DioClient(this._dio) {
     _dio
       ..options.baseUrl = ApiConstants.baseUrl
-      ..options.connectTimeout = const Duration(seconds: 1500)
-      ..options.receiveTimeout = const Duration(seconds: 1500)
+      ..options.connectTimeout = const Duration(seconds: 15)
+      ..options.receiveTimeout = const Duration(seconds: 15)
       ..options.responseType = ResponseType.json;
   }
 
@@ -25,7 +25,7 @@ class DioClient {
       options.headers ??= {};
 
       // Add the token to the headers
-      options.headers!['ApiKey'] = 'e2bbbb1c-024d-4f26-9abe-e7874cbc8937';
+      options.headers!['ApiKey'] = ApiConstants.apiKey;
 
       final Response response = await _dio.get(
         url,
@@ -55,7 +55,7 @@ class DioClient {
       options.headers ??= {};
 
       // Add the token to the headers
-      options.headers!['ApiKey'] = 'e2bbbb1c-024d-4f26-9abe-e7874cbc8937';
+      options.headers!['ApiKey'] = ApiConstants.apiKey;
 
       final Response response = await _dio.post(
         url,
@@ -87,7 +87,7 @@ class DioClient {
       options.headers ??= {};
 
       // Add the token to the headers
-      options.headers!['ApiKey'] = 'e2bbbb1c-024d-4f26-9abe-e7874cbc8937';
+      options.headers!['ApiKey'] = ApiConstants.apiKey;
 
       final Response response = await _dio.put(
         url,
@@ -117,7 +117,7 @@ class DioClient {
       options.headers ??= {};
 
       // Add the token to the headers
-      options.headers!['ApiKey'] = 'e2bbbb1c-024d-4f26-9abe-e7874cbc8937';
+      options.headers!['ApiKey'] = ApiConstants.apiKey;
 
       final Response response = await _dio.delete(
         url,
