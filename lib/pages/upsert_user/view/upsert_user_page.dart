@@ -13,7 +13,6 @@ class UpsertUserPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: PreferredSize(
         preferredSize: Size.zero,
         child: AppBar(),

@@ -255,35 +255,39 @@ class _EachNameAndPhoneNumberTexts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        /// Top Padding
-        const SizedBox(height: 13),
-        Text.rich(
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: CommonStyles.bodyLargeBlack(),
-          TextSpan(
-            text: user.firstName ?? '',
-            children: [
-              const TextSpan(
-                text: ' ',
-              ),
-              TextSpan(
-                text: user.lastName ?? '',
-              ),
-            ],
+    return SizedBox(
+      /// This width is used for TextOverFlow
+      width: ScreenUtil.getScreenSize().width - 144,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// Top Padding
+          const SizedBox(height: 13),
+          Text.rich(
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: CommonStyles.bodyLargeBlack(),
+            TextSpan(
+              text: user.firstName ?? '',
+              children: [
+                const TextSpan(
+                  text: ' ',
+                ),
+                TextSpan(
+                  text: user.lastName ?? '',
+                ),
+              ],
+            ),
           ),
-        ),
-        Text(
-          user.phoneNumber ?? '',
-          style: CommonStyles.bodyLargeGrey(),
-        ),
+          Text(
+            user.phoneNumber ?? '',
+            style: CommonStyles.bodyLargeGrey(),
+          ),
 
-        /// Bottom Padding
-        const SizedBox(height: 13),
-      ],
+          /// Bottom Padding
+          const SizedBox(height: 13),
+        ],
+      ),
     );
   }
 }

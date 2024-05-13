@@ -57,17 +57,29 @@ class UpsertUserForm extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _CancelEditDoneButtons(),
-                const SizedBox(height: 25),
-                _UserPhoto(),
-                _AddChangePhotoButton(),
-                const SizedBox(height: 24),
-                _FirstName(),
-                if ((isUpdate && isEditable) || (!isUpdate && !isEditable)) const SizedBox(height: 20),
-                _LastName(),
-                if ((isUpdate && isEditable) || (!isUpdate && !isEditable)) const SizedBox(height: 20),
-                _PhoneNumber(),
-                if ((isUpdate && !isEditable) || (!isUpdate && state.createStatus == Status.success && !isEditable)) _DeleteButton(),
-                const Spacer(),
+
+                /// This extra column was written to be able to see the phoneNumber TextFormField when the keyboard is open.
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 25),
+                        _UserPhoto(),
+                        _AddChangePhotoButton(),
+                        const SizedBox(height: 24),
+                        _FirstName(),
+                        if ((isUpdate && isEditable) || (!isUpdate && !isEditable)) const SizedBox(height: 20),
+                        _LastName(),
+                        if ((isUpdate && isEditable) || (!isUpdate && !isEditable)) const SizedBox(height: 20),
+                        _PhoneNumber(),
+                        if ((isUpdate && !isEditable) || (!isUpdate && state.createStatus == Status.success && !isEditable)) _DeleteButton(),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           );
@@ -209,6 +221,11 @@ class _AddChangePhotoButtonState extends State<_AddChangePhotoButton> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
+      buildWhen: (prev, curr) =>
+          prev.isUpdate != curr.isUpdate ||
+          prev.createStatus != curr.createStatus ||
+          prev.image != curr.image ||
+          prev.selectedUser.profileImageUrl != curr.selectedUser.profileImageUrl,
       builder: (context, state) {
         var isUpdate = state.isUpdate;
         return Row(
@@ -319,7 +336,7 @@ class _AddChangePhotoButtonState extends State<_AddChangePhotoButton> {
               child: Text(
                 (isUpdate && state.selectedUser.profileImageUrl == null) ||
                         (!isUpdate &&
-                            ((state.createStatus == Status.idle && state.image == null) ||
+                            ((state.createStatus == Status.idle && (state.image == null || (state.image != null && state.image!.path.isEmpty))) ||
                                 (state.createStatus == Status.success && state.selectedUser.profileImageUrl == null)))
                     ? AppLocalizations.of(context)!.addPhoto
                     : AppLocalizations.of(context)!.changePhoto,
