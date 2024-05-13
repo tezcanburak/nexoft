@@ -17,13 +17,14 @@ class UpsertUserForm extends StatelessWidget {
           Navigator.pop(context);
           context.read<HomeCubit>().deleteStatusChanged(Status.showPopUp);
         }
-        if (state.createStatus == Status.success && state.isUpdate == false) {
+        if (state.createStatus == Status.showPopUp && state.isUpdate == false) {
           showModalBottomSheet(
             elevation: 0,
             context: context,
             barrierColor: Colors.transparent,
             backgroundColor: Colors.transparent,
             builder: (modalBottomSheetContext) {
+              context.read<HomeCubit>().createStatusChanged(Status.success);
               return ApproveBottomSheet(text: AppLocalizations.of(context)!.userAdded);
             },
           );
@@ -351,7 +352,7 @@ class _FirstName extends StatelessWidget {
               ? null
               : CommonDecorations.pageColorBorder15(),
           child: TextFormField(
-            initialValue: (isUpdate) || (!isUpdate && state.createStatus == Status.success) ? state.selectedUser.firstName : '',
+            initialValue: state.editedSelectedUser.firstName ?? '',
             textAlign: TextAlign.left,
             cursorColor: ColorConstants.blue,
             keyboardType: TextInputType.text,
@@ -388,7 +389,7 @@ class _LastName extends StatelessWidget {
               ? null
               : CommonDecorations.pageColorBorder15(),
           child: TextFormField(
-            initialValue: (isUpdate) || (!isUpdate && state.createStatus == Status.success) ? state.selectedUser.lastName : '',
+            initialValue: state.editedSelectedUser.lastName ?? '',
             textAlign: TextAlign.left,
             cursorColor: ColorConstants.blue,
             keyboardType: TextInputType.text,
@@ -428,7 +429,7 @@ class _PhoneNumber extends StatelessWidget {
               ? null
               : CommonDecorations.pageColorBorder15(),
           child: TextFormField(
-            initialValue: (isUpdate) || (!isUpdate && state.createStatus == Status.success) ? state.selectedUser.phoneNumber : '',
+            initialValue: state.editedSelectedUser.phoneNumber ?? '',
             textAlign: TextAlign.left,
             cursorColor: ColorConstants.blue,
             enabled: (isUpdate && !isEditable) || (!isUpdate && state.createStatus == Status.success && !isEditable) ? false : true,
@@ -451,8 +452,9 @@ class _DeleteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
+      buildWhen: (prev, curr) => prev.editedSelectedUser != curr.editedSelectedUser,
       builder: (context, state) {
-        var user = state.selectedUser;
+        var user = state.editedSelectedUser;
         return Row(
           children: [
             const SizedBox(width: 8),
@@ -480,6 +482,7 @@ class _DeleteButton extends StatelessWidget {
                           const SizedBox(height: 25),
                           InkWell(
                             onTap: () {
+                              Navigator.pop(context);
                               Navigator.pop(modalBottomSheetContext);
                               context.read<HomeCubit>().deleteUserRequested(user);
                             },

@@ -160,7 +160,8 @@ class _UserList extends StatelessWidget {
       _scrollListener(context);
     });
     return BlocBuilder<HomeCubit, HomeState>(
-      buildWhen: (prev, curr) => prev.filteredUserList != curr.filteredUserList || prev.fetchStatus != curr.fetchStatus,
+      buildWhen: (prev, curr) =>
+          prev.filteredUserList != curr.filteredUserList || prev.fetchStatus != curr.fetchStatus || prev.userList != curr.userList,
       builder: (context, state) {
         if (state.filteredUserList.isNotEmpty || state.fetchStatus == Status.inProgress) {
           return SingleChildScrollView(

@@ -83,7 +83,7 @@ class HomeCubit extends Cubit<HomeState> {
         createStatus: Status.inProgress,
       ),
     );
-    if (state.image != null) {
+    if (state.image != null && state.image!.path.isNotEmpty) {
       String? url = await homeRepository.uploadPhoto(state.image!);
       if (url != null && url.isNotEmpty) {
         User user = User(
@@ -102,6 +102,7 @@ class HomeCubit extends Cubit<HomeState> {
             state.copyWith(
               userList: userList,
               selectedUser: createdUser.data!,
+              editedSelectedUser: createdUser.data!,
               createStatus: Status.success,
               image: null,
             ),
@@ -131,6 +132,7 @@ class HomeCubit extends Cubit<HomeState> {
           state.copyWith(
             userList: userList,
             selectedUser: createdUser.data!,
+            editedSelectedUser: createdUser.data!,
             createStatus: Status.success,
             image: null,
           ),
@@ -245,7 +247,7 @@ class HomeCubit extends Cubit<HomeState> {
           state.copyWith(
             userList: userList,
             filteredUserList: userList,
-            deleteStatus: Status.success,
+            deleteStatus: Status.showPopUp,
           ),
         );
       }
