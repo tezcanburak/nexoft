@@ -175,6 +175,13 @@ class HomeCubit extends Cubit<HomeState> {
           ),
         );
       }
+      List<User> userList = List.from(state.userList);
+      var index = userList.indexWhere((element) => element.id == editedUser.id);
+      if (index != -1) {
+        userList[index] = editedUser;
+        sort(userList);
+        emit(state.copyWith(filteredUserList: userList, userList: userList));
+      }
     } else {
       emit(
         state.copyWith(
@@ -204,18 +211,18 @@ class HomeCubit extends Cubit<HomeState> {
               selectedUser: editedUser,
               editedSelectedUser: editedUser,
               createStatus: Status.success,
-              image: null,
+              image: XFile(''),
             ),
           );
         }
       } else {
         emit(
-          state.copyWith(createStatus: Status.failure, image: null),
+          state.copyWith(createStatus: Status.failure, image: XFile('')),
         );
       }
     } else {
       emit(
-        state.copyWith(createStatus: Status.failure, image: null),
+        state.copyWith(createStatus: Status.failure, image: XFile('')),
       );
     }
   }
@@ -231,6 +238,9 @@ class HomeCubit extends Cubit<HomeState> {
       if (isSuccess) {
         List<User> userList = List.from(state.userList);
         userList.remove(user);
+        if (userList.length < 10) {
+          getUsersList();
+        }
         emit(
           state.copyWith(
             userList: userList,

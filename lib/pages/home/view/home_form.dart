@@ -1,3 +1,4 @@
+import 'package:image_picker/image_picker.dart';
 import 'package:nexoft/exports.dart';
 import 'package:nexoft/model/user.dart';
 import 'package:nexoft/pages/home/cubit/home_cubit.dart';
@@ -79,7 +80,7 @@ class _ContactsAndAddButton extends StatelessWidget {
           onTap: () {
             context.read<HomeCubit>().isUpdateStatusChanged(false);
             context.read<HomeCubit>().createStatusChanged(Status.idle);
-            context.read<HomeCubit>().setImage(null);
+            context.read<HomeCubit>().setImage(XFile(''));
             context.read<HomeCubit>().selectedUserChanged(const User.empty());
 
             /// This (false) is for if user use back button in the phone, and then go to another person.
@@ -178,7 +179,7 @@ class _UserList extends StatelessWidget {
                       return InkWell(
                         onTap: () {
                           context.read<HomeCubit>().isUpdateStatusChanged(true);
-                          context.read<HomeCubit>().setImage(null);
+                          context.read<HomeCubit>().setImage(XFile(''));
 
                           /// This (false) is for if user use back button in the phone, and then pick another person.
                           context.read<HomeCubit>().isUserEditableStatusChanged(false);
@@ -316,7 +317,7 @@ class _ThereIsNoContactView extends StatelessWidget {
           onPressed: () {
             context.read<HomeCubit>().isUpdateStatusChanged(false);
             context.read<HomeCubit>().createStatusChanged(Status.idle);
-            context.read<HomeCubit>().setImage(null);
+            context.read<HomeCubit>().setImage(XFile(''));
             context.read<HomeCubit>().selectedUserChanged(const User.empty());
 
             /// This (false) is for if user use back button in the phone, and then go to another person.

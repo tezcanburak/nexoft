@@ -85,7 +85,6 @@ class _CancelEditDoneButtons extends StatelessWidget {
           prev.isUpdate != curr.isUpdate ||
           prev.selectedUser != curr.selectedUser ||
           prev.isUserEditable != curr.isUserEditable ||
-          prev.isUserEditable != curr.isUserEditable ||
           prev.createStatus != curr.createStatus ||
           prev.editedSelectedUser != curr.editedSelectedUser,
       builder: (context, state) {
@@ -342,7 +341,8 @@ class _FirstName extends StatelessWidget {
           prev.firstName != curr.firstName ||
           prev.isUpdate != curr.isUpdate ||
           prev.selectedUser != curr.selectedUser ||
-          prev.isUserEditable != curr.isUserEditable,
+          prev.isUserEditable != curr.isUserEditable ||
+          prev.editedSelectedUser != curr.editedSelectedUser,
       builder: (context, state) {
         var isUpdate = state.isUpdate;
         var isEditable = state.isUserEditable;
@@ -378,7 +378,8 @@ class _LastName extends StatelessWidget {
           prev.lastName != curr.lastName ||
           prev.isUpdate != curr.isUpdate ||
           prev.selectedUser != curr.selectedUser ||
-          prev.isUserEditable != curr.isUserEditable,
+          prev.isUserEditable != curr.isUserEditable ||
+          prev.editedSelectedUser != curr.editedSelectedUser,
       builder: (context, state) {
         var isUpdate = state.isUpdate;
         var isEditable = state.isUserEditable;
@@ -417,7 +418,8 @@ class _PhoneNumber extends StatelessWidget {
           prev.phoneNumber != curr.phoneNumber ||
           prev.isUpdate != curr.isUpdate ||
           prev.selectedUser != curr.selectedUser ||
-          prev.isUserEditable != curr.isUserEditable,
+          prev.isUserEditable != curr.isUserEditable ||
+          prev.editedSelectedUser != curr.editedSelectedUser,
       builder: (context, state) {
         var isUpdate = state.isUpdate;
         var isEditable = state.isUserEditable;
